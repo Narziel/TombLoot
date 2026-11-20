@@ -4,6 +4,7 @@
 #include "Survey.h"
 
 #include "Forms.h"
+#include "Swap.h"
 
 namespace Survey
 {
@@ -135,7 +136,7 @@ namespace Survey
 			if (!weapon && !armor) {
 				return Era::kOther;
 			}
-			if (armor && ancientArmor.contains(a_form->GetFormID())) {
+			if (ancientArmor.contains(a_form->GetFormID())) {
 				return Era::kAncient;
 			}
 			if (const auto* file = a_form->GetFile(0); file && ancientPlugins.contains(std::string(file->GetFilename()))) {
@@ -311,21 +312,107 @@ namespace Survey
 		}
 	}
 
-	void Run(const Config& a_config)
+	namespace
 	{
+		void Prepare(const Config& a_config)
+		{
+			ancientPlugins = { a_config.ancientPlugins.begin(), a_config.ancientPlugins.end() };
+			ancientArmor.clear();
+			for (const auto* ref : kAncientNordArmor) {
+				if (auto* form = Forms::Resolve(ref)) {
+					ancientArmor.insert(form->GetFormID());
+				}
+			}
+			for (const auto& ref : a_config.ancientItems) {
+				if (auto* form = Forms::Resolve(ref)) {
+					ancientArmor.insert(form->GetFormID());
+				}
+			}
+		}
+
+		// What a chest entry can give, remembering for each item of the wrong era the path that
+		// brings it: "chest entry > its entry". That path is what a player adds to the config.
+		struct Traced
+		{
+			Leaves                                     leaves;
+			std::map<std::string, std::vector<std::string>> wrongVia;  // path -> items
+		};
+
+		bool WrongEra(Era a_era)
+		{
+			return a_era == Era::kModern || a_era == Era::kUnknown;
+		}
+
+		void Trace(RE::TESForm* a_form, Traced& a_out, std::unordered_set<RE::FormID>& a_visited, const std::string& a_via, std::uint32_t a_depth)
+		{
+			if (!a_form || a_depth > kMaxDepth) {
+				return;
+			}
+			if (auto* list = a_form->As<RE::TESLevItem>()) {
+				if (!a_visited.insert(list->GetFormID()).second) {
+					return;
+				}
+				for (const auto& entry : list->entries) {
+					// The path keeps the first two levels: the chest entry, then its entry.
+					const auto via = a_depth == 0 ? std::format("{} > {}", a_via, Forms::Label(entry.form)) : a_via;
+					Trace(entry.form, a_out, a_visited, via, a_depth + 1);
+				}
+				return;
+			}
+			if (a_out.leaves.seen.contains(a_form->GetFormID())) {
+				return;
+			}
+			a_out.leaves.Add(a_form);
+			if (WrongEra(Classify(a_form))) {
+				auto& items = a_out.wrongVia[a_via];
+				if (items.size() < 3) {
+					items.push_back(std::format("{} [{}]", Forms::Named(a_form), a_form->GetFile(0) ? a_form->GetFile(0)->GetFilename() : "-"sv));
+				} else if (items.size() == 3) {
+					items.push_back("…");
+				}
+			}
+		}
+
+		void Summary()
+		{
+			for (const auto& report : Swap::Reports()) {
+				Traced                         traced;
+				std::unordered_set<RE::FormID> visited;  // shared by the family: each list walked once
+				for (auto* chest : report.chests) {
+					chest->ForEachContainerObject([&](RE::ContainerObject& a_obj) {
+						Trace(a_obj.obj, traced, visited, Forms::Label(a_obj.obj), 0);
+						return RE::BSContainer::ForEachResult::kContinue;
+					});
+				}
+				logger::info("[Summary] {}: {} lists ({} found by themselves), {} chests ({} found by themselves); {} list entries and {} chest entries replaced",
+					report.family, report.lists, report.foundLists, report.chests.size(), report.foundChests, report.entries, report.chestEntries);
+				logger::info("[Summary] {}: its chests can give {}", report.family, traced.leaves.Summary());
+				if (traced.wrongVia.empty()) {
+					logger::info("[Summary] {}: no gear of the wrong era left", report.family);
+				}
+				for (const auto& [via, items] : traced.wrongVia) {
+					std::string text;
+					for (const auto& item : items) {
+						text += text.empty() ? item : " ; " + item;
+					}
+					logger::info("[Summary] {}: wrong era via {}: {}", report.family, via, text);
+				}
+				for (auto* sub : report.sharedSublists) {
+					logger::info("[Summary] {}: sub-list {} holds generic lists but is shared with the rest of the world, kept as is", report.family,
+						Forms::Label(sub));
+				}
+			}
+		}
+
+		void Full(const Config& a_config)
+		{
 		auto* dh = RE::TESDataHandler::GetSingleton();
 		if (!dh) {
 			logger::error("[Survey] TESDataHandler missing");
 			return;
 		}
 
-		ancientPlugins = { a_config.ancientPlugins.begin(), a_config.ancientPlugins.end() };
-		ancientArmor.clear();
-		for (const auto* ref : kAncientNordArmor) {
-			if (auto* form = Forms::Resolve(ref)) {
-				ancientArmor.insert(form->GetFormID());
-			}
-		}
+		Prepare(a_config);
 
 		// DynamicContainerLoot: loaded, and did its merge run before us?
 		const bool dclLoaded = REX::W32::GetModuleHandleW(L"DynamicContainerLoot.dll") != nullptr;
@@ -411,15 +498,28 @@ namespace Survey
 			}
 		}
 
-		// 3. Totals per family: what a tomb chest can give today.
+		// 3. Totals per family of the seed chests.
 		for (const auto& [family, leaves] : byFamily) {
-			logger::info("[Summary] {}: {}", family, leaves.Summary());
+			logger::info("[Totals] {}: {}", family, leaves.Summary());
 			for (const auto e : { Era::kModern, Era::kUnknown }) {
 				const auto i = static_cast<std::size_t>(e);
 				for (const auto& text : leaves.examples[i]) {
-					logger::info("[Summary]   {} {}", kEraNames[i], text);
+					logger::info("[Totals]   {} {}", kEraNames[i], text);
 				}
 			}
+		}
+		}
+	}
+
+	void Run(const Config& a_config)
+	{
+		if (a_config.survey == Config::Survey::kOff) {
+			return;
+		}
+		Prepare(a_config);
+		Summary();
+		if (a_config.survey == Config::Survey::kFull) {
+			Full(a_config);
 		}
 	}
 }

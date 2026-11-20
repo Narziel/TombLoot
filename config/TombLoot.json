@@ -2,8 +2,13 @@
 // Formes écrites "Plugin.esp|0xIDLOCAL" (ID local, sans l'indice d'ordre de chargement).
 // Une forme dont le plugin est absent est ignorée (notée dans le log).
 {
-	// Relevé après le remplacement : ce que chaque coffre de tombeau peut donner (log seulement).
-	"survey": true,
+	// Bilan dans le log, après le remplacement : "summary" (quelques lignes par famille : ce que ses
+	// coffres peuvent donner, et d'où vient l'équipement qui n'est pas d'époque), "full" (plus le
+	// relevé détaillé de chaque liste) ou "off".
+	"survey": "summary",
+
+	// Objets d'époque sans mot-clé de matériau, pour le bilan seulement.
+	"ancient_items": [ "Dragonborn.esm|0x0398E6" ], // pioche nordique antique
 
 	// Plugins dont les armes et armures sont toutes d'époque, quels que soient leurs mots-clés
 	// (Ancient Nord Armoury marque ses pièces avec le mot-clé nordique de Dragonborn).
@@ -177,10 +182,8 @@
 			"Skyrim.esm|0x088515",     // LootDraugrWeapon25
 			"Skyrim.esm|0x0B4208",     // LootDraugrWeapon100
 			"Skyrim.esm|0x1019D0",     // LootDraugr1HWeapon100
-			// Sous-listes de mods réservées aux cryptes, qui reprennent elles aussi les listes génériques.
-			"Prvti_DragonCultWeapons.esp|0x000CEA", // PI_SublistLootDragonCult1HWeapon
-			"Prvti_DragonCultWeapons.esp|0x000CEB", // PI_SublistLootDragonCult2HWeapon
-			"Prvti_DragonCultWeapons.esp|0x000DFA", // PI_SublistLootDragonCultShield
+			// Les sous-listes de mods réservées aux cryptes (Prvti_DragonCultWeapons…) sont trouvées
+			// toutes seules ("auto_sublists"), comme les coffres qui contiennent ces listes ("auto_chests").
 			"Skyrim.esm|0x0C2963",     // LootDraugrArmor10
 			"Skyrim.esm|0x06883B",     // LootDraugrArmor25
 			"Skyrim.esm|0x088514",     // LootDraugrArmor50

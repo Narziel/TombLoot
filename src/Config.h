@@ -16,6 +16,8 @@ struct Config
 	{
 		std::vector<std::string> lists;       // lists whose generic entries are swapped
 		std::vector<std::string> containers;  // chests whose own entries are swapped (a shared list stays intact)
+		bool                     autoChests{ true };    // also every chest that holds one of `lists` directly
+		bool                     autoSublists{ true };  // also mod sub-lists used only by tomb lists
 		std::vector<Replacement> replace;  // generic list -> era list
 	};
 
@@ -36,8 +38,15 @@ struct Config
 		std::int8_t       chanceNone{ 0 };  // percent; keeps the chance of a list it replaces (10 % special loot)
 	};
 
-	bool                               survey{ true };
+	enum class Survey
+	{
+		kOff,
+		kSummary,  // a few lines per family: what its chests can give, and where gear of the wrong era comes from
+		kFull      // plus the detailed survey of every tomb list
+	};
+	Survey                             survey{ Survey::kSummary };
 	std::vector<std::string>           ancientPlugins;
+	std::vector<std::string>           ancientItems;  // gear of the era with no material keyword (survey only)
 	std::map<std::string, CreatedList> created;
 	// Families applied in this order: nordic (crypts of Skyrim), solstheim (Dragonborn lists), dwemer…
 	std::vector<std::pair<std::string, Family>> families;

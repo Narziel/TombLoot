@@ -29,6 +29,8 @@ namespace
 		}
 		family.lists = Strings(*it, "lists");
 		family.containers = Strings(*it, "containers");
+		family.autoChests = it->value("auto_chests", true);
+		family.autoSublists = it->value("auto_sublists", true);
 		if (auto rep = it->find("replace"); rep != it->end() && rep->is_array()) {
 			for (const auto& r : *rep) {
 				if (!r.is_object() || !r.contains("to") || !r["to"].is_string()) {
@@ -51,10 +53,17 @@ Config Config::Load()
 	}
 	try {
 		const auto json = nlohmann::json::parse(file, nullptr, true, true);  // comments allowed
-		if (auto it = json.find("survey"); it != json.end() && it->is_boolean()) {
-			cfg.survey = it->get<bool>();
+		// "off", "summary" or "full" (true / false accepted: full / off).
+		if (auto it = json.find("survey"); it != json.end()) {
+			if (it->is_boolean()) {
+				cfg.survey = it->get<bool>() ? Config::Survey::kFull : Config::Survey::kOff;
+			} else if (it->is_string()) {
+				const auto mode = it->get<std::string>();
+				cfg.survey = mode == "off" ? Config::Survey::kOff : mode == "full" ? Config::Survey::kFull : Config::Survey::kSummary;
+			}
 		}
 		cfg.ancientPlugins = Strings(json, "ancient_plugins");
+		cfg.ancientItems = Strings(json, "ancient_items");
 		if (auto it = json.find("created_lists"); it != json.end() && it->is_object()) {
 			for (const auto& [name, value] : it->items()) {
 				if (!value.is_object()) {
@@ -121,7 +130,8 @@ Config Config::Load()
 		families += std::format("{}{} {} lists / {} chests / {} replacements", families.empty() ? "" : ", ", name, family.lists.size(),
 			family.containers.size(), family.replace.size());
 	}
-	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists; {}", cfg.survey, cfg.ancientPlugins.size(),
+	constexpr const char* kSurveyNames[] = { "off", "summary", "full" };
+	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists; {}", kSurveyNames[static_cast<int>(cfg.survey)], cfg.ancientPlugins.size(),
 		cfg.created.size(), families.empty() ? "no family"s : families);
 	return cfg;
 }
