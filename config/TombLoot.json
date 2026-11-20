@@ -226,7 +226,8 @@
 				]
 			},
 			{
-				"to": "Skyrim.esm|0x024305", // LItemDraugr05WeaponBow
+				// Pas LItemDraugr05WeaponBow : elle mêle arcs elfique, orque et de verre.
+				"to": "Skyrim.esm|0x024302", // LItemDraugr02WeaponBow
 				"from": [ "Dragonborn.esm|0x026231" ] // DLC2StalhrimBow
 			},
 			{
