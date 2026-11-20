@@ -65,12 +65,13 @@ namespace Survey
 			kNordicDLC2,  // Dragonborn Nordic carved / stalhrim: modern, but used by some ancient armor mods
 			kModern,
 			kUnknown,  // gear with no recognized material keyword
+			kStaff,    // staves: no era, never replaced
 			kAmmo,
 			kOther,  // not gear: gold, gems, potions, scrolls…
 			kCount
 		};
 		constexpr const char* kEraNames[] = { "ancient", "dwemer", "falmer", "timeless", "nordic_dlc2", "modern", "unknown",
-			"ammo", "other" };
+			"staff", "ammo", "other" };
 		constexpr std::size_t kEras = static_cast<std::size_t>(Era::kCount);
 
 		struct MaterialRule
@@ -102,7 +103,8 @@ namespace Survey
 			{ "DLC2ArmorMaterial", Era::kModern },
 		};
 
-		std::unordered_set<RE::FormID> ancientArmor;
+		std::unordered_set<RE::FormID>  ancientArmor;
+		std::unordered_set<std::string> ancientPlugins;  // every weapon and armor of these files is ancient
 
 		std::string Keywords(const RE::BGSKeywordForm* a_form)
 		{
@@ -135,6 +137,14 @@ namespace Survey
 			}
 			if (armor && ancientArmor.contains(a_form->GetFormID())) {
 				return Era::kAncient;
+			}
+			if (const auto* file = a_form->GetFile(0); file && ancientPlugins.contains(std::string(file->GetFilename()))) {
+				return Era::kAncient;
+			}
+			if (weapon) {
+				if (auto* weap = a_form->As<RE::TESObjectWEAP>(); weap && weap->IsStaff()) {
+					return Era::kStaff;
+				}
 			}
 			auto* kwForm = a_form->As<RE::BGSKeywordForm>();
 			if (armor) {
@@ -193,7 +203,7 @@ namespace Survey
 
 			[[nodiscard]] bool HasGear() const
 			{
-				for (std::size_t e = 0; e < static_cast<std::size_t>(Era::kAmmo); ++e) {
+				for (std::size_t e = 0; e < static_cast<std::size_t>(Era::kStaff); ++e) {
 					if (counts[e]) {
 						return true;
 					}
@@ -301,7 +311,7 @@ namespace Survey
 		}
 	}
 
-	void Run()
+	void Run(const Config& a_config)
 	{
 		auto* dh = RE::TESDataHandler::GetSingleton();
 		if (!dh) {
@@ -309,6 +319,7 @@ namespace Survey
 			return;
 		}
 
+		ancientPlugins = { a_config.ancientPlugins.begin(), a_config.ancientPlugins.end() };
 		ancientArmor.clear();
 		for (const auto* ref : kAncientNordArmor) {
 			if (auto* form = Forms::Resolve(ref)) {

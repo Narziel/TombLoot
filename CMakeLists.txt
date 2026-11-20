@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
 	TombLoot
-	VERSION 0.1.0
+	VERSION 0.2.0
 	LANGUAGES CXX
 )
 
@@ -53,6 +53,10 @@ set(SOURCES
 	src/Forms.cpp
 	src/Survey.h
 	src/Survey.cpp
+	src/Config.h
+	src/Config.cpp
+	src/Swap.h
+	src/Swap.cpp
 )
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 
@@ -79,6 +83,8 @@ if(TOMBLOOT_DEPLOY)
 		COMMAND "${CMAKE_COMMAND}" -E make_directory "${_plugins_dir}"
 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${_plugins_dir}/"
 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_PDB_FILE:${PROJECT_NAME}>" "${_plugins_dir}/"
+		COMMAND "${CMAKE_COMMAND}" -E make_directory "${_plugins_dir}/TombLoot"
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/config/TombLoot.json" "${_plugins_dir}/TombLoot/"
 		COMMENT "Deploying ${PROJECT_NAME}.dll to ${_plugins_dir}"
 		VERBATIM
 	)

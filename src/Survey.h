@@ -3,9 +3,11 @@
 
 #pragma once
 
-// Step 1 of CONCEPTION.md: read-only survey of the tomb chests and their leveled lists, once all
-// plugins are loaded. Writes the log, changes nothing in the game.
+#include "Config.h"
+
+// Read-only survey of the tomb chests and their leveled lists, once all plugins are loaded and
+// after the swap: shows what a tomb chest can give now. Writes the log, changes nothing.
 namespace Survey
 {
-	void Run();
+	void Run(const Config& a_config);
 }

@@ -1,20 +1,43 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // TombLoot — Copyright (C) 2026 narziel. See COPYING.
 
+#include "Config.h"
 #include "Survey.h"
+#include "Swap.h"
 
 namespace
 {
+	template <class F>
+	void Step(const char* a_name, F&& a_fn)
+	{
+		logger::info("[Startup] {}: start", a_name);
+		const auto start = std::chrono::steady_clock::now();
+		a_fn();
+		const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+		logger::info("[Startup] {}: {} ms", a_name, ms);
+	}
+
 	void OnMessage(SKSE::MessagingInterface::Message* a_msg)
 	{
-		if (a_msg->type != SKSE::MessagingInterface::kDataLoaded) {
-			return;
+		switch (a_msg->type) {
+		case SKSE::MessagingInterface::kDataLoaded:
+			{
+				Config config;
+				Step("Config", [&] { config = Config::Load(); });
+				Step("Swap", [&] { Swap::Apply(config); });
+				if (config.survey) {
+					Step("Survey", [&] { Survey::Run(config); });
+				}
+			}
+			break;
+		case SKSE::MessagingInterface::kPostLoadGame:
+		case SKSE::MessagingInterface::kNewGame:
+			// The config is read again, so a change applies without restarting the game.
+			Step("Swap (game load)", [] { Swap::Apply(Config::Load()); });
+			break;
+		default:
+			break;
 		}
-		logger::info("[Startup] Survey: start");
-		const auto start = std::chrono::steady_clock::now();
-		Survey::Run();
-		const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
-		logger::info("[Startup] Survey: {} ms (read-only, nothing changed in the game)", ms);
 	}
 }
 
