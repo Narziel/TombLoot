@@ -54,12 +54,34 @@ Config Config::Load()
 			cfg.survey = it->get<bool>();
 		}
 		cfg.ancientPlugins = Strings(json, "ancient_plugins");
+		if (auto it = json.find("created_lists"); it != json.end() && it->is_object()) {
+			for (const auto& [name, value] : it->items()) {
+				if (!value.is_object()) {
+					continue;
+				}
+				Config::CreatedList list;
+				if (auto items = value.find("items"); items != value.end() && items->is_array()) {
+					for (const auto& item : *items) {
+						if (item.is_string()) {
+							list.items.push_back({ item.get<std::string>(), 1 });
+						} else if (item.is_object() && item.contains("form") && item["form"].is_string()) {
+							const auto level = item.value("level", 1);
+							list.items.push_back({ item["form"].get<std::string>(), static_cast<std::uint16_t>(std::clamp(level, 1, 255)) });
+						}
+					}
+				}
+				if (auto fb = value.find("fallback"); fb != value.end() && fb->is_string()) {
+					list.fallback = fb->get<std::string>();
+				}
+				cfg.created.emplace(name, std::move(list));
+			}
+		}
 		cfg.nordic = ReadFamily(json, "nordic");
 	} catch (const std::exception& e) {
 		logger::error("[Config] {} is invalid ({}): nothing will be replaced", kFile.string(), e.what());
 		return Config{};
 	}
-	logger::info("[Config] read: survey {}, {} ancient plugins, nordic {} lists / {} replacements", cfg.survey, cfg.ancientPlugins.size(),
-		cfg.nordic.lists.size(), cfg.nordic.replace.size());
+	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists, nordic {} lists / {} replacements", cfg.survey,
+		cfg.ancientPlugins.size(), cfg.created.size(), cfg.nordic.lists.size(), cfg.nordic.replace.size());
 	return cfg;
 }

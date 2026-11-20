@@ -18,9 +18,23 @@ struct Config
 		std::vector<Replacement> replace;  // generic list -> era list
 	};
 
-	bool                     survey{ true };
-	std::vector<std::string> ancientPlugins;
-	Family                   nordic;
+	// A leveled list made at launch (no vanilla list gives Ancient Nord armor), named "@name" in a
+	// replacement. A piece whose plugin is missing is skipped; an empty list falls back to `fallback`.
+	struct CreatedList
+	{
+		struct Item
+		{
+			std::string   form;
+			std::uint16_t level{ 1 };
+		};
+		std::vector<Item> items;
+		std::string       fallback;
+	};
+
+	bool                               survey{ true };
+	std::vector<std::string>           ancientPlugins;
+	std::map<std::string, CreatedList> created;
+	Family                             nordic;
 
 	// Reads the file; on a missing or invalid file, keeps the defaults (nothing replaced) and says so.
 	static Config Load();

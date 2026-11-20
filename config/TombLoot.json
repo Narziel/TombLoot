@@ -9,6 +9,47 @@
 	// (Ancient Nord Armoury marque ses pièces avec le mot-clé nordique de Dragonborn).
 	"ancient_plugins": [ "AncientNordArmo(u)ryEXTREMESE.esp" ],
 
+	// Listes créées au lancement, nommées "@nom" dans les remplacements. Une pièce dont le plugin est
+	// absent est ignorée ; une liste restée vide prend la liste "fallback". Niveau 1 par défaut ;
+	// l'ébène arrive au niveau 38 (paliers de Bethesda), à côté des pièces anciennes.
+	"created_lists": {
+		"ancient_cuirass": { "items": [
+			"Skyrim.esm|0x018388",                           // ArmorDraugrCuirass
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082E",    // ArmorDraugrCuirassCombo
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082F",    // ArmorDraugrCuirassMedium
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000830",    // ArmorDraugrCuirassLightFem
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000A6F",
+			{ "form": "Skyrim.esm|0x013961", "level": 38 }   // EbonyCuirass
+		] },
+		"ancient_helmet": { "items": [
+			"Skyrim.esm|0x056A9E",                           // ArmorDraugrHelmet
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000832",    // ArmorDraugrHelmetAntler
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000833",    // ArmorDraugrHelmetInfantry
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000834",    // ArmorDraugrHelmetLord
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000A49",
+			{ "form": "Skyrim.esm|0x013963", "level": 38 }   // EbonyHelmet
+		] },
+		"ancient_gauntlets": { "items": [
+			"Skyrim.esm|0x056B17",                           // ArmorDraugrGauntlets
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x000831",    // ArmorDraugrGauntletsLight
+			{ "form": "Skyrim.esm|0x013962", "level": 38 }   // EbonyGauntlets
+		] },
+		"ancient_boots": { "items": [
+			"Skyrim.esm|0x056A9D",                           // ArmorDraugrBoots
+			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082D",    // ArmorDraugrBootsLight
+			{ "form": "Skyrim.esm|0x013960", "level": 38 }   // EbonyBoots
+		] },
+		"ancient_shield": {
+			"items": [
+				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
+				{ "form": "Skyrim.esm|0x013964", "level": 38 } // EbonyShield
+			],
+			// Sans Ancient Nord Armoury, aucun bouclier ancien n'existe : on reprend celui des draugr
+			// de Bethesda (fer, ébène).
+			"fallback": "Skyrim.esm|0x018ECB" // LItemDraugrShield
+		}
+	},
+
 	"nordic": {
 		// Listes des cryptes nordiques dont les entrées génériques sont remplacées.
 		"lists": [
@@ -21,7 +62,15 @@
 			"Dragonborn.esm|0x02C448", // DLC2LootDraugrWeapon100
 			// Sous-listes de mods réservées aux cryptes, qui reprennent elles aussi les listes génériques.
 			"Prvti_DragonCultWeapons.esp|0x000CEA", // PI_SublistLootDragonCult1HWeapon
-			"Prvti_DragonCultWeapons.esp|0x000CEB"  // PI_SublistLootDragonCult2HWeapon
+			"Prvti_DragonCultWeapons.esp|0x000CEB", // PI_SublistLootDragonCult2HWeapon
+			"Prvti_DragonCultWeapons.esp|0x000DFA", // PI_SublistLootDragonCultShield
+			"Skyrim.esm|0x0C2963",     // LootDraugrArmor10
+			"Skyrim.esm|0x06883B",     // LootDraugrArmor25
+			"Skyrim.esm|0x088514",     // LootDraugrArmor50
+			"Skyrim.esm|0x0B4202",     // LootDraugrArmor100
+			"Dragonborn.esm|0x02C442", // DLC2LootDraugrArmor25
+			"Dragonborn.esm|0x02C443", // DLC2LootDraugrArmor50
+			"Dragonborn.esm|0x02C445"  // DLC2LootDraugrArmor100
 		],
 
 		// Liste générique -> liste d'époque. Seul l'objet de l'entrée change : niveau et nombre restent.
@@ -64,6 +113,46 @@
 				"from": [
 					"Skyrim.esm|0x068839",     // LItemArrowsAll
 					"Dragonborn.esm|0x02BC16"  // DLC2LItemArrowsAll
+				]
+			},
+			{
+				"to": "@ancient_cuirass",
+				"from": [
+					"Skyrim.esm|0x016739",     // LItemArmorCuirassAny
+					"Dragonborn.esm|0x02BC1B", // DLC2LItemArmorCuirassHeavy
+					"Dragonborn.esm|0x02BC1C"  // DLC2LItemArmorCuirassLight
+				]
+			},
+			{
+				"to": "@ancient_helmet",
+				"from": [
+					"Skyrim.esm|0x016743",     // LItemArmorHelmetAny
+					"Dragonborn.esm|0x02BC1F", // DLC2LItemArmorHelmetHeavy
+					"Dragonborn.esm|0x02BC20"  // DLC2LItemArmorHelmetLight
+				]
+			},
+			{
+				"to": "@ancient_gauntlets",
+				"from": [
+					"Skyrim.esm|0x016742",     // LItemArmorGauntletsAny
+					"Dragonborn.esm|0x02BC1D", // DLC2LItemArmorGauntletsHeavy
+					"Dragonborn.esm|0x02BC1E"  // DLC2LItemArmorGauntletsLight
+				]
+			},
+			{
+				"to": "@ancient_boots",
+				"from": [
+					"Skyrim.esm|0x01673C",     // LItemArmorBootsAny
+					"Dragonborn.esm|0x02BC19", // DLC2LItemArmorBootsHeavy
+					"Dragonborn.esm|0x02BC1A"  // DLC2LItemArmorBootsLight
+				]
+			},
+			{
+				"to": "@ancient_shield",
+				"from": [
+					"Skyrim.esm|0x0165E6",     // LItemArmorShieldAny
+					"Dragonborn.esm|0x02BC21", // DLC2LItemArmorShieldHeavy
+					"Dragonborn.esm|0x02BC22"  // DLC2LItemArmorShieldLight
 				]
 			}
 		]
