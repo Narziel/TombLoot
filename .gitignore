@@ -1,0 +1,6 @@
+# The build lives outside the repository (G:/Skyrim/_build), just in case
+/build/
+/out/
+/vcpkg_installed/
+.vs/
+*.user
