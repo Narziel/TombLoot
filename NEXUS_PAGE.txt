@@ -1,7 +1,7 @@
 =====================================================================
 TOMBLOOT — page Nexus (BBCode, à coller tel quel)
 Rédigée le 2026-11-20 pour la version 1.0.0 ; présentation réécrite, images dans art/.
-Les lignes [À DÉCIDER] / [À VÉRIFIER] sont pour toi : remplace-les ou supprime-les avant de publier.
+Tout est prêt à coller, champ par champ, dans l'ordre du formulaire Nexus.
 =====================================================================
 
 
@@ -22,8 +22,8 @@ IMAGES
 ---------------------------------------------------------------------
 - art/banner.png (1920x480) : image d'en-tête de la page (Header image).
 - art/key.png (1920x1080) : image principale (Primary image), vignette dans les listes et première image de la galerie.
-[À VÉRIFIER] Au téléversement, Nexus indique la taille attendue de l'en-tête ; si elle diffère, `art/render.ps1` régénère les deux images (voir art/README.md).
-[À DÉCIDER] Ajouter 2 ou 3 captures en jeu dans la galerie : un coffre de crypte ouvert, un coffre de boss, une ruine dwemer.
+Si Nexus demande une autre taille pour l'en-tête au téléversement, art/render.ps1 régénère les images (taille dans le script).
+Conseillé, pas obligatoire : 2 ou 3 captures en jeu dans la galerie (coffre de crypte ouvert, coffre de boss, ruine dwemer).
 
 
 ---------------------------------------------------------------------
@@ -124,8 +124,8 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 [size=4][color=#e6b65c][b]Requirements[/b][/color][/size]
 
 [list]
-[*]SKSE64
-[*]Address Library for SKSE Plugins
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/30379]SKSE64[/url]
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/32444]Address Library for SKSE Plugins[/url]
 [/list]
 
 [size=4][color=#e6b65c][b]Game version[/b][/color][/size]
@@ -134,7 +134,6 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 [*][b]Tested:[/b] Skyrim Anniversary Edition 1.6.1170 (Steam).
 [*]Built version-independent through Address Library: it should load on the other AE versions that Address Library covers. Not tested on SE 1.5.97. No VR.
 [/list]
-[À VÉRIFIER] Mêmes vérifications que pour Every Crumb Counts : versions couvertes par Address Library et SKSE.
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
 
@@ -144,24 +143,109 @@ TombLoot is free software under the GNU General Public License v3 or later. The 
 
 
 ---------------------------------------------------------------------
-FICHIERS (onglet Files)
+FORMULAIRE NEXUS — ÉTAPE 1 « Mod details »
 ---------------------------------------------------------------------
-1. Main file — "TombLoot" — TombLoot-1.0.0.zip
-   Description : The mod. Install with your mod manager.
-2. Miscellaneous — "TombLoot source" — TombLoot-1.0.0-source.zip
-   Description : Source code (GPL-3.0-or-later). Not needed to play.
+Mod name ............ TombLoot
+Version ............. 1.0.0
+Author .............. Narziels
+Category ............ Immersion   (deuxième choix : Gameplay)
+Language ............ English
+Brief overview ...... (section RÉSUMÉ ci-dessus)
+Detailed description  (section DESCRIPTION ci-dessus)
+Adult content ....... Non
+Tags (choisir parmi la liste de Nexus) : Loot, Immersion, Lore-Friendly, Dungeons, SKSE, No ESP / ESP-less, Compatibility
 
 
 ---------------------------------------------------------------------
-PERMISSIONS
+FORMULAIRE NEXUS — ÉTAPE 2 « Media »
 ---------------------------------------------------------------------
-[À DÉCIDER] Comme Every Crumb Counts : le code est sous GPL, donc modification et redistribution
-autorisées selon la GPL. Les captures et textes de la page : à toi de choisir.
+Header image ........ art/banner.png
+Primary image ....... art/key.png
+Titre de l'image principale : TombLoot — Ancient tombs. Ancient loot.
+Description de l'image principale : Original artwork. Nordic barrows, Solstheim and Dwemer ruins give loot of their own age.
 
 
 ---------------------------------------------------------------------
-CATÉGORIE ET TAGS
+FORMULAIRE NEXUS — ÉTAPE 3 « Files »
 ---------------------------------------------------------------------
-Catégorie : Gameplay (ou Items and Objects - Loot)
-Tags : Loot, Immersion, Lore-Friendly, SKSE, No ESP
-[À DÉCIDER] Captures d'écran : un coffre de crypte ouvert avec de l'équipement nordique antique.
+Fichier 1
+  File name ......... TombLoot
+  Version ........... 1.0.0
+  Category .......... Main Files
+  Fichier ........... G:\Skyrim\_build\TombLoot\TombLoot-1.0.0.zip
+  Description ....... The mod: SKSE plugin and its commented config. Install with your mod manager. Requires SKSE64 and Address Library.
+  Remove old versions : non (première version)
+
+Fichier 2
+  File name ......... TombLoot source
+  Version ........... 1.0.0
+  Category .......... Miscellaneous
+  Fichier ........... G:\Skyrim\_build\TombLoot\TombLoot-1.0.0-source.zip
+  Description ....... Source code (GPL-3.0-or-later), also on GitHub: https://github.com/Narziel/TombLoot (tag v1.0.0). Not needed to play.
+
+
+---------------------------------------------------------------------
+FORMULAIRE NEXUS — ÉTAPE 4 « Requirements »
+---------------------------------------------------------------------
+Nexus requirements :
+  - SKSE64 ................................. https://www.nexusmods.com/skyrimspecialedition/mods/30379
+      Note : Required.
+  - Address Library for SKSE Plugins ....... https://www.nexusmods.com/skyrimspecialedition/mods/32444
+      Note : Required.
+Off-site requirements : aucun.
+DLC requirements : aucun (les formes de Dragonborn sont utilisées si présentes ; dans l'édition Anniversaire elles le sont toujours).
+Mods requiring this file : aucun.
+
+Mods recommandés (à citer dans la case « Notes » si le formulaire en a une, sinon déjà dans la description) :
+  - Ancient Nord Armoury EXTREME : ses pièces anciennes remplissent les tombeaux.
+
+
+---------------------------------------------------------------------
+FORMULAIRE NEXUS — ÉTAPE 5 « Permissions »
+---------------------------------------------------------------------
+Le code est sous GPL-3.0-or-later (imposée par CommonLibSSE-NG) : tout le monde peut déjà réutiliser,
+modifier, traduire, convertir et redistribuer le mod, même dans un projet vendu, à condition de garder
+la licence et de partager le code. Les réponses du formulaire ne doivent pas être plus restrictives :
+
+  Upload permission ......................... Autorisé, avec crédit.
+  Modification permission ................... Autorisé, avec crédit.
+  Conversion permission ..................... Autorisé, avec crédit.
+  Asset use permission ...................... Autorisé, avec crédit.
+  Asset use in mods/files that are sold ..... Autorisé (la GPL le permet).
+  Asset use in mods/files that earn DP ...... Autorisé.
+  Donation Points ........................... Au choix (n'a pas d'effet sur la licence).
+
+Texte libre des permissions (« Additional notes ») :
+
+TombLoot is released under the GNU General Public License v3 or later. You may use, modify, translate and redistribute it, including in your own mods and collections, as long as you keep the license and share your source code under the same terms. The source is on GitHub: https://github.com/Narziel/TombLoot. The artwork in the header and primary image is original and may be reused under the same terms. A credit and a link back are always appreciated.
+
+
+---------------------------------------------------------------------
+ONGLET « Logs » (changelog, une ligne par point)
+---------------------------------------------------------------------
+1.0.0
+- Initial release.
+- Nordic barrows: Ancient Nord weapons, armor, arrows, enchanted gear and boss special loot.
+- Solstheim's barrows: the same, plus stalhrim at level 38.
+- Dwemer ruins: Dwarven and enchanted Dwarven gear.
+- Ebony at level 38, skipped with Open World Loot or MorrowLoot Ultimate.
+- Tomb chests and mod sub-lists found automatically; lists shared with the rest of the world never touched.
+- Short report in the log.
+
+
+---------------------------------------------------------------------
+PREMIER MESSAGE (onglet Posts, à épingler)
+---------------------------------------------------------------------
+[b]Welcome to TombLoot![/b]
+
+Thank you for trying it. A few things that help me help you:
+
+[list]
+[*][b]Found gear of the wrong age in a tomb?[/b] Open [font=Courier New]Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log[/font] and paste the lines that start with [b][Summary][/b]. They name the chest and the list that brought the item, so I can fix it quickly.
+[*][b]A barrow mod that is not covered?[/b] Tell me which one: its lists can usually be added to the config in one line, and I will add them to the next version.
+[*][b]Installed mid-game?[/b] Tombs you already visited keep their loot until they reset. That is how Skyrim fills chests, not a bug.
+[/list]
+
+The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url], and pull requests are welcome.
+
+[i]May the dead keep their own.[/i]
