@@ -1,25 +1,25 @@
-// TombLoot — butin d'époque dans les tombeaux.
-// Formes écrites "Plugin.esp|0xIDLOCAL" (ID local, sans l'indice d'ordre de chargement).
-// Une forme dont le plugin est absent est ignorée (notée dans le log).
+// TombLoot — era-appropriate loot in ancient tombs.
+// Forms are written "Plugin.esp|0xLOCALID" (local ID, without the load order index).
+// A form whose plugin is not loaded is skipped (and noted in the log).
 {
-	// Bilan dans le log, après le remplacement : "summary" (quelques lignes par famille : ce que ses
-	// coffres peuvent donner, et d'où vient l'équipement qui n'est pas d'époque), "full" (plus le
-	// relevé détaillé de chaque liste) ou "off".
+	// Report in the log, after the swap: "summary" (a few lines per family: what its chests can
+	// give, and where gear of the wrong era comes from), "full" (plus a detailed survey of every
+	// tomb list) or "off".
 	"survey": "summary",
 
-	// Objets d'époque sans mot-clé de matériau, pour le bilan seulement.
-	"ancient_items": [ "Dragonborn.esm|0x0398E6" ], // pioche nordique antique
+	// Era-appropriate items with no material keyword, for the report only.
+	"ancient_items": [ "Dragonborn.esm|0x0398E6" ], // Ancient Nord Pickaxe
 
-	// Plugins dont les armes et armures sont toutes d'époque, quels que soient leurs mots-clés
-	// (Ancient Nord Armoury marque ses pièces avec le mot-clé nordique de Dragonborn).
+	// Plugins whose weapons and armor are all era-appropriate, whatever their keywords (report only;
+	// Ancient Nord Armoury tags its pieces with the Dragonborn Nordic keyword).
 	"ancient_plugins": [ "AncientNordArmo(u)ryEXTREMESE.esp" ],
 
-	// Listes créées au lancement, nommées "@nom" dans les remplacements. Une pièce dont le plugin est
-	// absent est ignorée ; "only_if" la garde seulement si l'un des plugins est chargé, "unless" la
-	// retire si l'un d'eux l'est. Une liste restée vide prend sa liste "fallback" (forme ou "@nom") ;
-	// une liste sans pièce au niveau 1 la reçoit à ce niveau. Niveau 1 par défaut.
-	// L'ébène arrive au niveau 38 (paliers de Bethesda), sauf avec Open World Loot ou MorrowLoot
-	// Ultimate, qui interdisent l'ébène aléatoire.
+	// Lists made at launch, named "@name" in the replacements. A piece whose plugin is missing is
+	// skipped; "only_if" keeps it only if one of the plugins is loaded, "unless" drops it if one of
+	// them is. A list left empty is replaced by its "fallback" (a form or "@name"); a list with no
+	// piece at level 1 gets its fallback at level 1. Level 1 by default.
+	// Ebony comes at level 38 (Bethesda's tiers), except with Open World Loot or MorrowLoot
+	// Ultimate, which ban random ebony.
 	"created_lists": {
 		"ancient_cuirass": { "items": [
 			"Skyrim.esm|0x018388",                           // ArmorDraugrCuirass
@@ -47,8 +47,8 @@
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082D",    // ArmorDraugrBootsLight
 			{ "form": "Skyrim.esm|0x013960", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] }   // EbonyBoots
 		] },
-		// Solstheim : les mêmes pièces, plus le stalhrim au palier de l'ébène. Le stalhrim, glace de
-		// Solstheim travaillée par les anciens Nordiques, n'a sa place que dans les cryptes de l'île.
+		// Solstheim: the same pieces, plus stalhrim at the ebony tier. Stalhrim, the ice of Solstheim
+		// worked by the ancient Nords, belongs only in the island's barrows.
 		"solstheim_cuirass": { "extends": "ancient_cuirass", "items": [
 			{ "form": "Dragonborn.esm|0x01CD9F", "level": 38 }, // DLC2ArmorStalhrimHeavyCuirass
 			{ "form": "Dragonborn.esm|0x01CDA2", "level": 38 }  // DLC2ArmorStalhrimLightCuirass
@@ -68,14 +68,14 @@
 		"solstheim_shield": { "extends": "ancient_shield", "items": [
 			{ "form": "Dragonborn.esm|0x026237", "level": 38 }  // DLC2ArmorStalhrimShield
 		] },
-		// Objets enchantés. Armes : les armes anciennes enchantées de Bethesda (givre, boss draugr).
+		// Enchanted items. Weapons: Bethesda's enchanted Ancient Nord weapons (draugr bosses).
 		"ancient_ench_weapon": { "items": [
 			"Skyrim.esm|0x0DDD62", // LItemDraugr02BossWeapon1HMagic
 			"Skyrim.esm|0x0DDD63"  // LItemDraugr02BossWeapon2HMagic
 		] },
-		// Armures : les sous-listes d'armure nordique antique enchantée d'Ancient Nord Armoury, aux
-		// paliers que le mod leur donne (2, 4, 6). Sans lui, aucune armure ancienne enchantée n'existe :
-		// on donne une arme ancienne enchantée à la place.
+		// Armor: Ancient Nord Armoury's enchanted Ancient Nord armor sub-lists, at the tiers the mod
+		// gives them (2, 4, 6). Without it, no enchanted Ancient Nord armor exists: an enchanted
+		// Ancient Nord weapon is given instead.
 		"ancient_ench_armor": {
 			"items": [
 				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000961", "level": 2 }, // SublistEnchArmorDraugrCuirass01
@@ -96,16 +96,16 @@
 			],
 			"fallback": "Skyrim.esm|0x0DDD62" // LItemDraugr02BossWeapon1HMagic
 		},
-		// Solstheim : les mêmes, plus le stalhrim enchanté de Dragonborn au palier de l'ébène.
+		// Solstheim: the same, plus Dragonborn's enchanted stalhrim at the ebony tier.
 		"solstheim_ench_weapon": { "extends": "ancient_ench_weapon", "items": [
 			{ "form": "Dragonborn.esm|0x037846", "level": 38 } // DLC2LItemEnchStalhrimWeaponAny75
 		] },
 		"solstheim_ench_armor": { "extends": "ancient_ench_armor", "items": [
 			{ "form": "Dragonborn.esm|0x037847", "level": 38 } // DLC2LItemEnchStalhrimArmorAny75
 		] },
-		// Butin spécial des coffres de boss draugr : le haut de gamme d'époque. Armes des boss draugr
-		// du palier supérieur, armure nordique antique au meilleur enchantement, et la part d'objets
-		// divers du butin spécial de Bethesda.
+		// Special loot of draugr boss chests: the best of the era. Higher-tier draugr boss weapons,
+		// Ancient Nord armor at the best enchantment, and the miscellaneous share of Bethesda's
+		// special loot.
 		"ancient_special": {
 			"items": [
 				"Skyrim.esm|0x0DDD70",                         // LItemDraugr04BossWeapon1HMagic
@@ -115,7 +115,7 @@
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000966",  // SublistEnchArmorDraugrGauntlets03
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x00096C",  // SublistEnchArmorDraugrBoots03
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000970",  // SublistEnchArmorDraugrShield03
-				"Skyrim.esm|0x10FCEF"                          // objets divers du butin spécial
+				"Skyrim.esm|0x10FCEF"                          // miscellaneous special loot
 			],
 			"fallback": "Skyrim.esm|0x0DDD70"
 		},
@@ -123,7 +123,7 @@
 			{ "form": "Dragonborn.esm|0x037846", "level": 38 }, // DLC2LItemEnchStalhrimWeaponAny75
 			{ "form": "Dragonborn.esm|0x037847", "level": 38 }  // DLC2LItemEnchStalhrimArmorAny75
 		] },
-		// Ruines dwemer. Armes enchantées : les armes dwemer enchantées de Bethesda.
+		// Dwemer ruins. Enchanted weapons: Bethesda's enchanted Dwarven weapons.
 		"dwemer_ench_weapon": { "items": [
 			"Skyrim.esm|0x0C9A36", // LItemEnchDwarvenSword
 			"Skyrim.esm|0x0C9A37", // LItemEnchDwarvenWarAxe
@@ -134,16 +134,16 @@
 			"Skyrim.esm|0x0C9A38", // LItemEnchDwarvenWarhammer
 			"Skyrim.esm|0x0C9A32"  // LItemEnchDwarvenBow
 		] },
-		// Armures enchantées : les sous-listes d'armure dwemer enchantée de Bethesda, trois paliers.
+		// Enchanted armor: Bethesda's enchanted Dwarven armor sub-lists, three tiers.
 		"dwemer_ench_armor": { "items": [
-			"Skyrim.esm|0x08B64A", { "form": "Skyrim.esm|0x08B64B", "level": 15 }, { "form": "Skyrim.esm|0x08B64C", "level": 17 }, // cuirasse
-			"Skyrim.esm|0x08B650", { "form": "Skyrim.esm|0x08B651", "level": 15 }, { "form": "Skyrim.esm|0x08B652", "level": 17 }, // casque
-			"Skyrim.esm|0x08B64D", { "form": "Skyrim.esm|0x08B64E", "level": 15 }, { "form": "Skyrim.esm|0x08B64F", "level": 17 }, // gantelets
-			"Skyrim.esm|0x08B647", { "form": "Skyrim.esm|0x08B648", "level": 15 }, { "form": "Skyrim.esm|0x08B649", "level": 17 }, // bottes
-			"Skyrim.esm|0x08B653", { "form": "Skyrim.esm|0x08FFEF", "level": 15 }, { "form": "Skyrim.esm|0x08FFF0", "level": 17 }  // bouclier
+			"Skyrim.esm|0x08B64A", { "form": "Skyrim.esm|0x08B64B", "level": 15 }, { "form": "Skyrim.esm|0x08B64C", "level": 17 }, // cuirass
+			"Skyrim.esm|0x08B650", { "form": "Skyrim.esm|0x08B651", "level": 15 }, { "form": "Skyrim.esm|0x08B652", "level": 17 }, // helmet
+			"Skyrim.esm|0x08B64D", { "form": "Skyrim.esm|0x08B64E", "level": 15 }, { "form": "Skyrim.esm|0x08B64F", "level": 17 }, // gauntlets
+			"Skyrim.esm|0x08B647", { "form": "Skyrim.esm|0x08B648", "level": 15 }, { "form": "Skyrim.esm|0x08B649", "level": 17 }, // boots
+			"Skyrim.esm|0x08B653", { "form": "Skyrim.esm|0x08FFEF", "level": 15 }, { "form": "Skyrim.esm|0x08FFF0", "level": 17 }  // shield
 		] },
-		// Butin spécial des coffres dwemer : armes dwemer enchantées des boss, armure dwemer au meilleur
-		// enchantement, et la part d'objets divers du butin spécial de Bethesda.
+		// Special loot of Dwemer chests: enchanted Dwarven boss weapons, Dwarven armor at the best
+		// enchantment, and the miscellaneous share of Bethesda's special loot.
 		"dwemer_special": { "items": [
 			"Skyrim.esm|0x0DDD8C", // LItemEnchDwarvenSwordBoss
 			"Skyrim.esm|0x0DDD9C", // LItemEnchDwarvenWarAxeBoss
@@ -156,34 +156,34 @@
 			"Skyrim.esm|0x08B64F", // SublistEnchArmorDwarvenGauntlets04
 			"Skyrim.esm|0x08B649", // SublistEnchArmorDwarvenBoots04
 			"Skyrim.esm|0x08FFF0", // SublistEnchArmorDwarvenShield04
-			"Skyrim.esm|0x10FCEF"  // objets divers du butin spécial
+			"Skyrim.esm|0x10FCEF"  // miscellaneous special loot
 		] },
-		// Le butin spécial à 10 % garde sa chance : 90 % de ne rien donner.
+		// The 10 % special loot keeps its chance: 90 % of giving nothing.
 		"dwemer_special10": { "extends": "dwemer_special", "chance_none": 90, "items": [] },
 		"ancient_special10": { "extends": "ancient_special", "chance_none": 90, "items": [] },
 		"solstheim_special10": { "extends": "solstheim_special", "chance_none": 90, "items": [] },
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
-				// Pas la liste de boucliers draugr (LItemDraugrShield) : bouclier de fer chez Bethesda et
-				// MorrowLoot, bouclier de fer cabossé de Dragonborn chez Open World Loot.
-				{ "form": "MLU.esp|0x05CACA", "level": 21 },  // ANHShield, bouclier de héros nordique antique
+				// Not the draugr shield list (LItemDraugrShield): an iron shield in vanilla and MorrowLoot,
+				// Dragonborn's battered iron shield with Open World Loot.
+				{ "form": "MLU.esp|0x05CACA", "level": 21 },  // ANHShield, Ancient Nord Hero shield (MorrowLoot Ultimate)
 				{ "form": "Skyrim.esm|0x013964", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] } // EbonyShield
 			],
-			// Aucun bouclier ancien sans ces mods : un casque ancien à la place, plutôt qu'un bouclier de fer.
+			// No ancient shield without these mods: an Ancient Nord helmet instead of an iron shield.
 			"fallback": "@ancient_helmet"
 		}
 	},
 
 	"nordic": {
-		// Listes des cryptes nordiques dont les entrées génériques sont remplacées.
+		// Lists of the Nordic barrows whose generic entries are replaced.
 		"lists": [
 			"Skyrim.esm|0x068837",     // LootDraugrWeapon15
 			"Skyrim.esm|0x088515",     // LootDraugrWeapon25
 			"Skyrim.esm|0x0B4208",     // LootDraugrWeapon100
 			"Skyrim.esm|0x1019D0",     // LootDraugr1HWeapon100
-			// Les sous-listes de mods réservées aux cryptes (Prvti_DragonCultWeapons…) sont trouvées
-			// toutes seules ("auto_sublists"), comme les coffres qui contiennent ces listes ("auto_chests").
+			// Mod sub-lists used only by tombs (Prvti_DragonCultWeapons…) are found by themselves
+			// ("auto_sublists": true by default), like the chests that hold these lists ("auto_chests").
 			"Skyrim.esm|0x0C2963",     // LootDraugrArmor10
 			"Skyrim.esm|0x06883B",     // LootDraugrArmor25
 			"Skyrim.esm|0x088514",     // LootDraugrArmor50
@@ -196,14 +196,14 @@
 			"Skyrim.esm|0x034902"      // LootDraugrEnchArmor100
 		],
 
-		// Coffres dont les entrées propres sont remplacées : leur butin spécial est une liste partagée
-		// avec 35 coffres (boss dwemer, falmer…), qui reste intacte.
+		// Chests whose own entries are replaced: their special loot is a list shared with 35 chests
+		// (Dwemer and Falmer bosses…), which stays intact. Every chest holding one of "lists" is added.
 		"containers": [
 			"Skyrim.esm|0x020671",     // TreasDraugrChestBoss
-			"Skyrim.esm|0x020670"      // TreasDraugrChest (butin spécial à 10 % dans le jeu de base)
+			"Skyrim.esm|0x020670"      // TreasDraugrChest (10 % special loot in the base game)
 		],
 
-		// Liste générique -> liste d'époque. Seul l'objet de l'entrée change : niveau et nombre restent.
+		// Generic list -> era list. Only the entry's object changes: level and count stay.
 		"replace": [
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
@@ -217,7 +217,7 @@
 					"Dragonborn.esm|0x02BC13", // DLC2LItemWeaponWarAxe
 					"Dragonborn.esm|0x02BC11", // DLC2LItemWeaponMace
 					"Dragonborn.esm|0x02BC0F", // DLC2LItemWeaponDagger
-					// Armes nordiques gravées (équipement d'aujourd'hui), posées directement dans les listes.
+					// Nordic carved weapons (today's gear), put directly in the lists.
 					"Dragonborn.esm|0x01CDAE", // DLC2NordicDagger
 					"Dragonborn.esm|0x01CDB0", // DLC2NordicMace
 					"Dragonborn.esm|0x01CDB1", // DLC2NordicSword
@@ -252,10 +252,10 @@
 				"from": [
 					"Skyrim.esm|0x068839",     // LItemArrowsAll
 					"Dragonborn.esm|0x02BC16", // DLC2LItemArrowsAll
-					"Dragonborn.esm|0x02BC15"  // flèches nordiques de Dragonborn
+					"Dragonborn.esm|0x02BC15"  // Dragonborn's Nordic arrows
 				]
 			},
-			// Stalhrim hors de Solstheim : remplacé par l'ébène des seigneurs draugr, au même niveau.
+			// Stalhrim outside Solstheim: the draugr lords' list instead, same level (ebony in vanilla).
 			{
 				"to": "Skyrim.esm|0x023C10", // LItemDraugr05Weapon1H
 				"from": [
@@ -274,17 +274,17 @@
 				]
 			},
 			{
-				// Pas LItemDraugr05WeaponBow : elle mêle arcs elfique, orque et de verre.
+				// Not LItemDraugr05WeaponBow: it mixes elven, orcish and glass bows.
 				"to": "Skyrim.esm|0x024302", // LItemDraugr02WeaponBow
 				"from": [ "Dragonborn.esm|0x026231" ] // DLC2StalhrimBow
 			},
 			{
 				"to": "Skyrim.esm|0x037C13", // BaseArrowEbony75
-				"from": [ "Dragonborn.esm|0x026239" ] // flèche de stalhrim
+				"from": [ "Dragonborn.esm|0x026239" ] // stalhrim arrow
 			},
-			// Armures. Les listes "draugr et nordique" d'Ancient Nord Armoury mêlent ses pièces anciennes
-			// (déjà dans nos listes) au fer renforcé et au nordique gravé : elles sont remplacées aussi,
-			// dans les cryptes seulement (le mod lui-même n'est pas modifié).
+			// Armor. Ancient Nord Armoury's "draugr and Nordic" lists mix its ancient pieces (already in
+			// our lists) with reinforced iron and Nordic carved: they are replaced too, in tombs only
+			// (the mod itself is not changed).
 			{
 				"to": "@ancient_cuirass",
 				"from": [
@@ -320,21 +320,21 @@
 					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099D"   // LItemDraugrandNordicShield
 				]
 			},
-			// Enchantés. Les listes enchantées d'Ancient Nord Armoury passent au nordique gravé enchanté
-			// à partir du niveau 25 : remplacées aussi.
+			// Enchanted. Ancient Nord Armoury's enchanted lists switch to enchanted Nordic carved from
+			// level 25: replaced too.
 			{
 				"to": "@ancient_special",
-				"from": [ "Skyrim.esm|0x1031D0" ]                  // butin spécial 100 % des coffres de boss
+				"from": [ "Skyrim.esm|0x1031D0" ]                  // 100 % special loot of boss chests
 			},
 			{
 				"to": "@ancient_special10",
-				"from": [ "Skyrim.esm|0x10B2C0" ]                  // butin spécial 10 % des coffres ordinaires
+				"from": [ "Skyrim.esm|0x10B2C0" ]                  // 10 % special loot of ordinary chests
 			},
 			{
 				"to": "@ancient_ench_weapon",
 				"from": [
 					"Skyrim.esm|0x04B58C",                         // LItemEnchWeaponAny
-					// Nordique gravé et stalhrim enchantés de Dragonborn, ajoutés aux cryptes de Bordeciel.
+					// Dragonborn's enchanted Nordic carved and stalhrim, added to Skyrim's barrows.
 					"Dragonborn.esm|0x02B0D2", "Dragonborn.esm|0x02B0D3", "Dragonborn.esm|0x02B0D4", "Dragonborn.esm|0x02B0D5",
 					"Dragonborn.esm|0x02B0D6", "Dragonborn.esm|0x02B0D7", "Dragonborn.esm|0x02B0D8", "Dragonborn.esm|0x02B0D9", // DLC2LItemEnchNordic*
 					"Dragonborn.esm|0x037845",                     // DLC2LItemEnchWeaponNordicAll
@@ -359,8 +359,8 @@
 	},
 
 	"solstheim": {
-		// Listes d'armure des cryptes de Solstheim (Dragonborn) : mêmes remplacements, vers les listes
-		// "solstheim_*" qui ajoutent le stalhrim.
+		// Lists of Solstheim's barrows (Dragonborn): the same replacements, to the "solstheim_*"
+		// lists that add stalhrim.
 		"lists": [
 			"Dragonborn.esm|0x02C442", // DLC2LootDraugrArmor25
 			"Dragonborn.esm|0x02C443", // DLC2LootDraugrArmor50
@@ -374,24 +374,24 @@
 		],
 		"containers": [
 			"Dragonborn.esm|0x02AAC2", // DLC2TreasDraugrChestBoss
-			"Dragonborn.esm|0x02AAC1"  // DLC2TreasDraugrChest (butin spécial à 10 %)
+			"Dragonborn.esm|0x02AAC1"  // DLC2TreasDraugrChest (10 % special loot)
 		],
 		"replace": [
 			{
 				"to": "@solstheim_special",
 				"from": [
-					"Skyrim.esm|0x1031D0",     // butin spécial 100 % de Bordeciel
+					"Skyrim.esm|0x1031D0",     // Skyrim's 100 % special loot
 					"Dragonborn.esm|0x02BC3F"  // DLC2LItemSpecialLoot100
 				]
 			},
 			{
 				"to": "@solstheim_special10",
 				"from": [
-					"Skyrim.esm|0x10B2C0",     // butin spécial 10 % de Bordeciel
+					"Skyrim.esm|0x10B2C0",     // Skyrim's 10 % special loot
 					"Dragonborn.esm|0x02BC2F"  // DLC2LItemSpecialLoot10
 				]
 			},
-			// Armes : génériques et nordique gravé -> anciennes ; le stalhrim reste.
+			// Weapons: generic and Nordic carved -> Ancient Nord; stalhrim stays.
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
 				"from": [
@@ -489,8 +489,8 @@
 		},
 
 	"dwemer": {
-		// Ruines dwemer : Open World Loot y met les listes dwemer, le Bashed Patch y remet les listes
-		// génériques. Elles deviennent dwemer.
+		// Dwemer ruins: Open World Loot puts Dwarven lists there, a Bashed Patch brings the generic
+		// lists back. They become Dwarven.
 		"lists": [
 			"Skyrim.esm|0x070C0B",     // LootDwarvenArmor100
 			"Skyrim.esm|0x070C0C",     // LootDwarvenArmor15
@@ -502,7 +502,7 @@
 			"Skyrim.esm|0x070C12",     // LootDwarvenEnchWeapons100
 			"Skyrim.esm|0x070C13"      // LootDwarvenEnchWeapons20
 		],
-		// Le butin spécial (100 % et 10 %) est partagé avec d'autres coffres : remplacé dans ceux-ci seulement.
+		// The special loot (100 % and 10 %) is shared with other chests: replaced in these chests only.
 		"containers": [
 			"Skyrim.esm|0x020652",     // TreasDwarvenChestBoss
 			"Skyrim.esm|0x02069A",     // TreasDwarvenChestLarge
@@ -534,11 +534,11 @@
 			},
 			{
 				"to": "@dwemer_special",
-				"from": [ "Skyrim.esm|0x1031D0" ] // butin spécial 100 %
+				"from": [ "Skyrim.esm|0x1031D0" ] // 100 % special loot
 			},
 			{
 				"to": "@dwemer_special10",
-				"from": [ "Skyrim.esm|0x10B2C0" ] // butin spécial 10 %
+				"from": [ "Skyrim.esm|0x10B2C0" ] // 10 % special loot
 			}
 		]
 	}
