@@ -158,9 +158,8 @@
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
-				// Open World Loot fait de la liste de boucliers draugr son propre bouclier draugr ancien
-				// (chez Bethesda et MorrowLoot, elle donne un bouclier de fer : jamais sans OWL).
-				{ "form": "Skyrim.esm|0x018ECB", "only_if": [ "Open World Loot.esp" ] }, // LItemDraugrShield
+				// Pas la liste de boucliers draugr (LItemDraugrShield) : bouclier de fer chez Bethesda et
+				// MorrowLoot, bouclier de fer cabossé de Dragonborn chez Open World Loot.
 				{ "form": "MLU.esp|0x05CACA", "level": 21 },  // ANHShield, bouclier de héros nordique antique
 				{ "form": "Skyrim.esm|0x013964", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] } // EbonyShield
 			],
