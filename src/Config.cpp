@@ -81,20 +81,30 @@ Config Config::Load()
 				}
 				cfg.created.emplace(name, std::move(list));
 			}
-			// "extends": the parent's pieces (as read from the file) come first; one level only.
-			for (auto& [name, list] : cfg.created) {
-				if (list.extends.empty()) {
-					continue;
+			// "extends": the parent's pieces come first, the parent resolved first (chains allowed, a
+			// loop or an unknown parent is ignored with a warning).
+			std::set<std::string>                                  done;
+			std::function<void(const std::string&, std::uint32_t)> resolve = [&](const std::string& a_name, std::uint32_t a_depth) {
+				auto& list = cfg.created.at(a_name);
+				if (done.contains(a_name) || list.extends.empty()) {
+					done.insert(a_name);
+					return;
 				}
 				auto parent = cfg.created.find(list.extends);
-				if (parent == cfg.created.end() || parent->first == name || !parent->second.extends.empty()) {
-					logger::warn("[Config] @{} extends @{}: unknown, itself, or a list that extends another; ignored", name, list.extends);
-					continue;
+				if (parent == cfg.created.end() || a_depth > 8) {
+					logger::warn("[Config] @{} extends @{}: unknown parent or a loop; ignored", a_name, list.extends);
+					done.insert(a_name);
+					return;
 				}
+				resolve(parent->first, a_depth + 1);
 				list.items.insert(list.items.begin(), parent->second.items.begin(), parent->second.items.end());
 				if (list.fallback.empty()) {
 					list.fallback = parent->second.fallback;
 				}
+				done.insert(a_name);
+			};
+			for (const auto& [name, list] : cfg.created) {
+				resolve(name, 0);
 			}
 		}
 		for (const char* name : { "nordic", "solstheim", "dwemer" }) {

@@ -155,6 +155,8 @@
 		] },
 		// Le butin spécial à 10 % garde sa chance : 90 % de ne rien donner.
 		"dwemer_special10": { "extends": "dwemer_special", "chance_none": 90, "items": [] },
+		"ancient_special10": { "extends": "ancient_special", "chance_none": 90, "items": [] },
+		"solstheim_special10": { "extends": "solstheim_special", "chance_none": 90, "items": [] },
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
@@ -194,7 +196,8 @@
 		// Coffres dont les entrées propres sont remplacées : leur butin spécial est une liste partagée
 		// avec 35 coffres (boss dwemer, falmer…), qui reste intacte.
 		"containers": [
-			"Skyrim.esm|0x020671"      // TreasDraugrChestBoss
+			"Skyrim.esm|0x020671",     // TreasDraugrChestBoss
+			"Skyrim.esm|0x020670"      // TreasDraugrChest (butin spécial à 10 % dans le jeu de base)
 		],
 
 		// Liste générique -> liste d'époque. Seul l'objet de l'entrée change : niveau et nombre restent.
@@ -321,6 +324,10 @@
 				"from": [ "Skyrim.esm|0x1031D0" ]                  // butin spécial 100 % des coffres de boss
 			},
 			{
+				"to": "@ancient_special10",
+				"from": [ "Skyrim.esm|0x10B2C0" ]                  // butin spécial 10 % des coffres ordinaires
+			},
+			{
 				"to": "@ancient_ench_weapon",
 				"from": [
 					"Skyrim.esm|0x04B58C",                         // LItemEnchWeaponAny
@@ -363,7 +370,8 @@
 			"Dragonborn.esm|0x02C448"  // DLC2LootDraugrWeapon100
 		],
 		"containers": [
-			"Dragonborn.esm|0x02AAC2"  // DLC2TreasDraugrChestBoss
+			"Dragonborn.esm|0x02AAC2", // DLC2TreasDraugrChestBoss
+			"Dragonborn.esm|0x02AAC1"  // DLC2TreasDraugrChest (butin spécial à 10 %)
 		],
 		"replace": [
 			{
@@ -371,6 +379,13 @@
 				"from": [
 					"Skyrim.esm|0x1031D0",     // butin spécial 100 % de Bordeciel
 					"Dragonborn.esm|0x02BC3F"  // DLC2LItemSpecialLoot100
+				]
+			},
+			{
+				"to": "@solstheim_special10",
+				"from": [
+					"Skyrim.esm|0x10B2C0",     // butin spécial 10 % de Bordeciel
+					"Dragonborn.esm|0x02BC2F"  // DLC2LItemSpecialLoot10
 				]
 			},
 			// Armes : génériques et nordique gravé -> anciennes ; le stalhrim reste.
