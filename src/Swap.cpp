@@ -17,6 +17,14 @@ namespace Swap
 		};
 		std::vector<Saved> saved;  // entries changed by the last application
 
+		struct SavedChest
+		{
+			RE::TESObjectCONT*    chest;
+			std::uint32_t         index;
+			RE::TESBoundObject*   original;
+		};
+		std::vector<SavedChest> savedChests;
+
 		void Restore()
 		{
 			for (auto it = saved.rbegin(); it != saved.rend(); ++it) {
@@ -24,10 +32,16 @@ namespace Swap
 					it->list->entries[it->index].form = it->original;
 				}
 			}
-			if (!saved.empty()) {
-				logger::info("[Swap] {} entries restored before applying again", saved.size());
+			for (auto it = savedChests.rbegin(); it != savedChests.rend(); ++it) {
+				if (it->index < it->chest->numContainerObjects && it->chest->containerObjects[it->index]) {
+					it->chest->containerObjects[it->index]->obj = it->original;
+				}
+			}
+			if (!saved.empty() || !savedChests.empty()) {
+				logger::info("[Swap] {} list entries and {} chest entries restored before applying again", saved.size(), savedChests.size());
 			}
 			saved.clear();
+			savedChests.clear();
 		}
 
 		// Lists made at launch, by name. Made once per session; refilled at each application.
@@ -152,6 +166,35 @@ namespace Swap
 				total += changed;
 			}
 			logger::info("[Swap] {}: {} entries replaced in {} lists", a_name, total, a_family.lists.size());
+
+			// Chests: only their own entries change, so a list shared with other chests stays intact.
+			std::uint32_t chestTotal = 0;
+			for (const auto& ref : a_family.containers) {
+				auto* form = Forms::Resolve(ref);
+				auto* chest = form ? form->As<RE::TESObjectCONT>() : nullptr;
+				if (!chest) {
+					logger::info("[Swap] {}: chest {} not loaded, skipped", a_name, ref);
+					continue;
+				}
+				std::uint32_t changed = 0;
+				for (std::uint32_t i = 0; i < chest->numContainerObjects; ++i) {
+					auto* obj = chest->containerObjects[i];
+					auto  it = obj && obj->obj ? table.find(obj->obj) : table.end();
+					if (it == table.end()) {
+						continue;
+					}
+					logger::info("[Swap] {} chest {} #{} x{}: {} -> {}", a_name, Forms::Label(chest), i, obj->count, Forms::Label(obj->obj),
+						Forms::Label(it->second));
+					savedChests.push_back({ chest, i, obj->obj });
+					obj->obj = it->second;
+					++changed;
+				}
+				logger::info("[Swap] {} chest {} (winner {}): {} entries replaced", a_name, Forms::Named(chest), Forms::Winner(chest), changed);
+				chestTotal += changed;
+			}
+			if (!a_family.containers.empty()) {
+				logger::info("[Swap] {}: {} entries replaced in {} chests", a_name, chestTotal, a_family.containers.size());
+			}
 		}
 	}
 

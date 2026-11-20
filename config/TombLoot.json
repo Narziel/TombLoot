@@ -95,6 +95,26 @@
 		"solstheim_ench_armor": { "extends": "ancient_ench_armor", "items": [
 			{ "form": "Dragonborn.esm|0x037847", "level": 38 } // DLC2LItemEnchStalhrimArmorAny75
 		] },
+		// Butin spécial des coffres de boss draugr : le haut de gamme d'époque. Armes des boss draugr
+		// du palier supérieur, armure nordique antique au meilleur enchantement, et la part d'objets
+		// divers du butin spécial de Bethesda.
+		"ancient_special": {
+			"items": [
+				"Skyrim.esm|0x0DDD70",                         // LItemDraugr04BossWeapon1HMagic
+				"Skyrim.esm|0x0DDD71",                         // LItemDraugr04BossWeapon2HMagic
+				"AncientNordArmo(u)ryEXTREMESE.esp|0x000963",  // SublistEnchArmorDraugrCuirass03
+				"AncientNordArmo(u)ryEXTREMESE.esp|0x000969",  // SublistEnchArmorDraugrHelmet03
+				"AncientNordArmo(u)ryEXTREMESE.esp|0x000966",  // SublistEnchArmorDraugrGauntlets03
+				"AncientNordArmo(u)ryEXTREMESE.esp|0x00096C",  // SublistEnchArmorDraugrBoots03
+				"AncientNordArmo(u)ryEXTREMESE.esp|0x000970",  // SublistEnchArmorDraugrShield03
+				"Skyrim.esm|0x10FCEF"                          // objets divers du butin spécial
+			],
+			"fallback": "Skyrim.esm|0x0DDD70"
+		},
+		"solstheim_special": { "extends": "ancient_special", "items": [
+			{ "form": "Dragonborn.esm|0x037846", "level": 38 }, // DLC2LItemEnchStalhrimWeaponAny75
+			{ "form": "Dragonborn.esm|0x037847", "level": 38 }  // DLC2LItemEnchStalhrimArmorAny75
+		] },
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
@@ -127,6 +147,12 @@
 			"Skyrim.esm|0x0B5561",     // LootDraugrEnchArmor15
 			"Skyrim.esm|0x0B5562",     // LootDraugrEnchArmor25
 			"Skyrim.esm|0x034902"      // LootDraugrEnchArmor100
+		],
+
+		// Coffres dont les entrées propres sont remplacées : leur butin spécial est une liste partagée
+		// avec 35 coffres (boss dwemer, falmer…), qui reste intacte.
+		"containers": [
+			"Skyrim.esm|0x020671"      // TreasDraugrChestBoss
 		],
 
 		// Liste générique -> liste d'époque. Seul l'objet de l'entrée change : niveau et nombre restent.
@@ -248,6 +274,10 @@
 			// Enchantés. Les listes enchantées d'Ancient Nord Armoury passent au nordique gravé enchanté
 			// à partir du niveau 25 : remplacées aussi.
 			{
+				"to": "@ancient_special",
+				"from": [ "Skyrim.esm|0x1031D0" ]                  // butin spécial 100 % des coffres de boss
+			},
+			{
 				"to": "@ancient_ench_weapon",
 				"from": [
 					"Skyrim.esm|0x04B58C",                         // LItemEnchWeaponAny
@@ -289,7 +319,17 @@
 			"Dragonborn.esm|0x02C444", // DLC2LootDraugrWeapon25
 			"Dragonborn.esm|0x02C448"  // DLC2LootDraugrWeapon100
 		],
+		"containers": [
+			"Dragonborn.esm|0x02AAC2"  // DLC2TreasDraugrChestBoss
+		],
 		"replace": [
+			{
+				"to": "@solstheim_special",
+				"from": [
+					"Skyrim.esm|0x1031D0",     // butin spécial 100 % de Bordeciel
+					"Dragonborn.esm|0x02BC3F"  // DLC2LItemSpecialLoot100
+				]
+			},
 			// Armes : génériques et nordique gravé -> anciennes ; le stalhrim reste.
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H

@@ -28,6 +28,7 @@ namespace
 			return family;
 		}
 		family.lists = Strings(*it, "lists");
+		family.containers = Strings(*it, "containers");
 		if (auto rep = it->find("replace"); rep != it->end() && rep->is_array()) {
 			for (const auto& r : *rep) {
 				if (!r.is_object() || !r.contains("to") || !r["to"].is_string()) {

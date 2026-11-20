@@ -14,7 +14,8 @@ struct Config
 
 	struct Family
 	{
-		std::vector<std::string> lists;    // lists whose generic entries are swapped
+		std::vector<std::string> lists;       // lists whose generic entries are swapped
+		std::vector<std::string> containers;  // chests whose own entries are swapped (a shared list stays intact)
 		std::vector<Replacement> replace;  // generic list -> era list
 	};
 
