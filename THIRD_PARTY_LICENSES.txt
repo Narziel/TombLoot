@@ -3,7 +3,7 @@ TombLoot — third-party licenses
 
 TombLoot is free software, licensed under the GNU General Public License,
 version 3 or (at your option) any later version. The full text is in COPYING.
-Copyright (C) 2026 narziel. Source code: see the Nexus Mods page (source archive in the Files tab).
+Copyright (C) 2026 narziel. Source code: https://github.com/Narziel/TombLoot (tag v<version>), and the source archive in the Files tab of the Nexus Mods page.
 
 The plugin (TombLoot.dll) statically links the libraries listed below. Their
 copyright notices and licenses follow, as their licenses require.

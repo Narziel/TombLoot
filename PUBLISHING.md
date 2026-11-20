@@ -29,7 +29,7 @@ cmake --build --preset release --target package_source
 1. Relire `NEXUS_PAGE.txt`, régler les lignes `[À DÉCIDER]` / `[À VÉRIFIER]`.
 2. Captures d'écran : un coffre de crypte ouvert (équipement nordique antique), un coffre dwemer.
 3. Créer la page, téléverser les deux archives (Main file, puis Miscellaneous pour la source).
-4. Après publication : noter l'adresse de la page dans `THIRD_PARTY_LICENSES.txt` (ligne « Source code ») pour la version suivante.
+4. Pour chaque version : étiquette git `v<version>` poussée sur https://github.com/Narziel/TombLoot (code source de la version, GPL 6 d), archive source sur Nexus en plus.
 
 ## Support
 
