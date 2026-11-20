@@ -113,9 +113,6 @@
 			"Skyrim.esm|0x088515",     // LootDraugrWeapon25
 			"Skyrim.esm|0x0B4208",     // LootDraugrWeapon100
 			"Skyrim.esm|0x1019D0",     // LootDraugr1HWeapon100
-			"Dragonborn.esm|0x02C441", // DLC2LootDraugrWeapon15
-			"Dragonborn.esm|0x02C444", // DLC2LootDraugrWeapon25
-			"Dragonborn.esm|0x02C448", // DLC2LootDraugrWeapon100
 			// Sous-listes de mods réservées aux cryptes, qui reprennent elles aussi les listes génériques.
 			"Prvti_DragonCultWeapons.esp|0x000CEA", // PI_SublistLootDragonCult1HWeapon
 			"Prvti_DragonCultWeapons.esp|0x000CEB", // PI_SublistLootDragonCult2HWeapon
@@ -145,7 +142,12 @@
 					"Dragonborn.esm|0x02BC12", // DLC2LItemWeaponSword
 					"Dragonborn.esm|0x02BC13", // DLC2LItemWeaponWarAxe
 					"Dragonborn.esm|0x02BC11", // DLC2LItemWeaponMace
-					"Dragonborn.esm|0x02BC0F"  // DLC2LItemWeaponDagger
+					"Dragonborn.esm|0x02BC0F", // DLC2LItemWeaponDagger
+					// Armes nordiques gravées (équipement d'aujourd'hui), posées directement dans les listes.
+					"Dragonborn.esm|0x01CDAE", // DLC2NordicDagger
+					"Dragonborn.esm|0x01CDB0", // DLC2NordicMace
+					"Dragonborn.esm|0x01CDB1", // DLC2NordicSword
+					"Dragonborn.esm|0x01CDB2"  // DLC2NordicWarAxe
 				]
 			},
 			{
@@ -157,22 +159,53 @@
 					"Skyrim.esm|0x0165B9",     // LItemWeaponAny2H
 					"Dragonborn.esm|0x02BC0D", // DLC2LItemWeaponBattleAxe
 					"Dragonborn.esm|0x02BC10", // DLC2LItemWeaponGreatSword
-					"Dragonborn.esm|0x02BC14"  // DLC2LItemWeaponWarhammer
+					"Dragonborn.esm|0x02BC14", // DLC2LItemWeaponWarhammer
+					"Dragonborn.esm|0x01CDAD", // DLC2NordicBattleAxe
+					"Dragonborn.esm|0x01CDAF", // DLC2NordicGreatsword
+					"Dragonborn.esm|0x01CDB3"  // DLC2NordicWarhammer
 				]
 			},
 			{
 				"to": "Skyrim.esm|0x024302", // LItemDraugr02WeaponBow
 				"from": [
 					"Skyrim.esm|0x017024",     // LItemWeaponBow
-					"Dragonborn.esm|0x02BC0E"  // DLC2LItemWeaponBow
+					"Dragonborn.esm|0x02BC0E", // DLC2LItemWeaponBow
+					"Dragonborn.esm|0x026232"  // DLC2NordicBow
 				]
 			},
 			{
 				"to": "Skyrim.esm|0x024304", // LItemDraugr02WeaponArrowSublist
 				"from": [
 					"Skyrim.esm|0x068839",     // LItemArrowsAll
-					"Dragonborn.esm|0x02BC16"  // DLC2LItemArrowsAll
+					"Dragonborn.esm|0x02BC16", // DLC2LItemArrowsAll
+					"Dragonborn.esm|0x02BC15"  // flèches nordiques de Dragonborn
 				]
+			},
+			// Stalhrim hors de Solstheim : remplacé par l'ébène des seigneurs draugr, au même niveau.
+			{
+				"to": "Skyrim.esm|0x023C10", // LItemDraugr05Weapon1H
+				"from": [
+					"Dragonborn.esm|0x01CDB5", // DLC2StalhrimDagger
+					"Dragonborn.esm|0x01CDB7", // DLC2StalhrimMace
+					"Dragonborn.esm|0x01CDB8", // DLC2StalhrimSword
+					"Dragonborn.esm|0x01CDB9"  // DLC2StalhrimWarAxe
+				]
+			},
+			{
+				"to": "Skyrim.esm|0x023C1E", // LItemDraugr05Weapon2H
+				"from": [
+					"Dragonborn.esm|0x01CDB4", // DLC2StalhrimBattleAxe
+					"Dragonborn.esm|0x01CDB6", // DLC2StalhrimGreatsword
+					"Dragonborn.esm|0x01CDBA"  // DLC2StalhrimWarhammer
+				]
+			},
+			{
+				"to": "Skyrim.esm|0x024305", // LItemDraugr05WeaponBow
+				"from": [ "Dragonborn.esm|0x026231" ] // DLC2StalhrimBow
+			},
+			{
+				"to": "Skyrim.esm|0x037C13", // BaseArrowEbony75
+				"from": [ "Dragonborn.esm|0x026239" ] // flèche de stalhrim
 			},
 			// Armures. Les listes "draugr et nordique" d'Ancient Nord Armoury mêlent ses pièces anciennes
 			// (déjà dans nos listes) au fer renforcé et au nordique gravé : elles sont remplacées aussi,
@@ -217,7 +250,14 @@
 			{
 				"to": "@ancient_ench_weapon",
 				"from": [
-					"Skyrim.esm|0x04B58C"                          // LItemEnchWeaponAny
+					"Skyrim.esm|0x04B58C",                         // LItemEnchWeaponAny
+					// Nordique gravé et stalhrim enchantés de Dragonborn, ajoutés aux cryptes de Bordeciel.
+					"Dragonborn.esm|0x02B0D2", "Dragonborn.esm|0x02B0D3", "Dragonborn.esm|0x02B0D4", "Dragonborn.esm|0x02B0D5",
+					"Dragonborn.esm|0x02B0D6", "Dragonborn.esm|0x02B0D7", "Dragonborn.esm|0x02B0D8", "Dragonborn.esm|0x02B0D9", // DLC2LItemEnchNordic*
+					"Dragonborn.esm|0x037845",                     // DLC2LItemEnchWeaponNordicAll
+					"Dragonborn.esm|0x02B9EA", "Dragonborn.esm|0x02B9EB", "Dragonborn.esm|0x02B9EC", "Dragonborn.esm|0x02B9ED",
+					"Dragonborn.esm|0x02B9EE", "Dragonborn.esm|0x02B9EF", "Dragonborn.esm|0x02B9F0", "Dragonborn.esm|0x02B9F1", // DLC2LItemEnchStalhrim*
+					"Dragonborn.esm|0x037846"                      // DLC2LItemEnchStalhrimWeaponAny75
 				]
 			},
 			{
@@ -244,9 +284,37 @@
 			"Dragonborn.esm|0x02C445", // DLC2LootDraugrArmor100
 			"Dragonborn.esm|0x02C446", // DLC2LootDraugrEnchArmor100
 			"Dragonborn.esm|0x02C447", // DLC2LootDraugrEnchWeapons100
-			"Dragonborn.esm|0x02C44B"  // DLC2LootDraugrChestBossMagicItem25
+			"Dragonborn.esm|0x02C44B", // DLC2LootDraugrChestBossMagicItem25
+			"Dragonborn.esm|0x02C441", // DLC2LootDraugrWeapon15
+			"Dragonborn.esm|0x02C444", // DLC2LootDraugrWeapon25
+			"Dragonborn.esm|0x02C448"  // DLC2LootDraugrWeapon100
 		],
 		"replace": [
+			// Armes : génériques et nordique gravé -> anciennes ; le stalhrim reste.
+			{
+				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
+				"from": [
+					"Skyrim.esm|0x016578", "Skyrim.esm|0x016579", "Skyrim.esm|0x016577", "Skyrim.esm|0x017178", "Skyrim.esm|0x0165BA",
+					"Dragonborn.esm|0x02BC12", "Dragonborn.esm|0x02BC13", "Dragonborn.esm|0x02BC11", "Dragonborn.esm|0x02BC0F",
+					"Dragonborn.esm|0x01CDAE", "Dragonborn.esm|0x01CDB0", "Dragonborn.esm|0x01CDB1", "Dragonborn.esm|0x01CDB2"
+				]
+			},
+			{
+				"to": "Skyrim.esm|0x024300", // LItemDraugr02Weapon2H
+				"from": [
+					"Skyrim.esm|0x01657C", "Skyrim.esm|0x01657A", "Skyrim.esm|0x0165B8", "Skyrim.esm|0x0165B9",
+					"Dragonborn.esm|0x02BC0D", "Dragonborn.esm|0x02BC10", "Dragonborn.esm|0x02BC14",
+					"Dragonborn.esm|0x01CDAD", "Dragonborn.esm|0x01CDAF", "Dragonborn.esm|0x01CDB3"
+				]
+			},
+			{
+				"to": "Skyrim.esm|0x024302", // LItemDraugr02WeaponBow
+				"from": [ "Skyrim.esm|0x017024", "Dragonborn.esm|0x02BC0E", "Dragonborn.esm|0x026232" ]
+			},
+			{
+				"to": "Skyrim.esm|0x024304", // LItemDraugr02WeaponArrowSublist
+				"from": [ "Skyrim.esm|0x068839", "Dragonborn.esm|0x02BC16", "Dragonborn.esm|0x02BC15" ]
+			},
 			{
 				"to": "@solstheim_cuirass",
 				"from": [
@@ -296,7 +364,10 @@
 				"to": "@solstheim_ench_weapon",
 				"from": [
 					"Skyrim.esm|0x04B58C",                         // LItemEnchWeaponAny
-					"Dragonborn.esm|0x02BC0C"                      // DLC2LItemEnchWeaponAny
+					"Dragonborn.esm|0x02BC0C",                     // DLC2LItemEnchWeaponAny
+					"Dragonborn.esm|0x02B0D2", "Dragonborn.esm|0x02B0D3", "Dragonborn.esm|0x02B0D4", "Dragonborn.esm|0x02B0D5",
+					"Dragonborn.esm|0x02B0D6", "Dragonborn.esm|0x02B0D7", "Dragonborn.esm|0x02B0D8", "Dragonborn.esm|0x02B0D9", // DLC2LItemEnchNordic*
+					"Dragonborn.esm|0x037845"                      // DLC2LItemEnchWeaponNordicAll
 				]
 			},
 			{
