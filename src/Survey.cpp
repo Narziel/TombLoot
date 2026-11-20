@@ -380,7 +380,7 @@ namespace Survey
 				std::unordered_set<RE::FormID> visited;  // shared by the family: each list walked once
 				for (auto* chest : report.chests) {
 					chest->ForEachContainerObject([&](RE::ContainerObject& a_obj) {
-						Trace(a_obj.obj, traced, visited, Forms::Label(a_obj.obj), 0);
+						Trace(a_obj.obj, traced, visited, std::format("chest {} > {}", Forms::Named(chest), Forms::Label(a_obj.obj)), 0);
 						return RE::BSContainer::ForEachResult::kContinue;
 					});
 				}
