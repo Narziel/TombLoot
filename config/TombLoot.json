@@ -10,8 +10,11 @@
 	"ancient_plugins": [ "AncientNordArmo(u)ryEXTREMESE.esp" ],
 
 	// Listes créées au lancement, nommées "@nom" dans les remplacements. Une pièce dont le plugin est
-	// absent est ignorée ; une liste restée vide prend la liste "fallback". Niveau 1 par défaut ;
-	// l'ébène arrive au niveau 38 (paliers de Bethesda), à côté des pièces anciennes.
+	// absent est ignorée ; "only_if" la garde seulement si l'un des plugins est chargé, "unless" la
+	// retire si l'un d'eux l'est. Une liste restée vide prend sa liste "fallback" (forme ou "@nom") ;
+	// une liste sans pièce au niveau 1 la reçoit à ce niveau. Niveau 1 par défaut.
+	// L'ébène arrive au niveau 38 (paliers de Bethesda), sauf avec Open World Loot ou MorrowLoot
+	// Ultimate, qui interdisent l'ébène aléatoire.
 	"created_lists": {
 		"ancient_cuirass": { "items": [
 			"Skyrim.esm|0x018388",                           // ArmorDraugrCuirass
@@ -19,7 +22,7 @@
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082F",    // ArmorDraugrCuirassMedium
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x000830",    // ArmorDraugrCuirassLightFem
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x000A6F",
-			{ "form": "Skyrim.esm|0x013961", "level": 38 }   // EbonyCuirass
+			{ "form": "Skyrim.esm|0x013961", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] }   // EbonyCuirass
 		] },
 		"ancient_helmet": { "items": [
 			"Skyrim.esm|0x056A9E",                           // ArmorDraugrHelmet
@@ -27,17 +30,17 @@
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x000833",    // ArmorDraugrHelmetInfantry
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x000834",    // ArmorDraugrHelmetLord
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x000A49",
-			{ "form": "Skyrim.esm|0x013963", "level": 38 }   // EbonyHelmet
+			{ "form": "Skyrim.esm|0x013963", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] }   // EbonyHelmet
 		] },
 		"ancient_gauntlets": { "items": [
 			"Skyrim.esm|0x056B17",                           // ArmorDraugrGauntlets
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x000831",    // ArmorDraugrGauntletsLight
-			{ "form": "Skyrim.esm|0x013962", "level": 38 }   // EbonyGauntlets
+			{ "form": "Skyrim.esm|0x013962", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] }   // EbonyGauntlets
 		] },
 		"ancient_boots": { "items": [
 			"Skyrim.esm|0x056A9D",                           // ArmorDraugrBoots
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082D",    // ArmorDraugrBootsLight
-			{ "form": "Skyrim.esm|0x013960", "level": 38 }   // EbonyBoots
+			{ "form": "Skyrim.esm|0x013960", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] }   // EbonyBoots
 		] },
 		// Solstheim : les mêmes pièces, plus le stalhrim au palier de l'ébène. Le stalhrim, glace de
 		// Solstheim travaillée par les anciens Nordiques, n'a sa place que dans les cryptes de l'île.
@@ -155,11 +158,14 @@
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
-				{ "form": "Skyrim.esm|0x013964", "level": 38 } // EbonyShield
+				// Open World Loot fait de la liste de boucliers draugr son propre bouclier draugr ancien
+				// (chez Bethesda et MorrowLoot, elle donne un bouclier de fer : jamais sans OWL).
+				{ "form": "Skyrim.esm|0x018ECB", "only_if": [ "Open World Loot.esp" ] }, // LItemDraugrShield
+				{ "form": "MLU.esp|0x05CACA", "level": 21 },  // ANHShield, bouclier de héros nordique antique
+				{ "form": "Skyrim.esm|0x013964", "level": 38, "unless": [ "Open World Loot.esp", "MLU.esp" ] } // EbonyShield
 			],
-			// Sans Ancient Nord Armoury, aucun bouclier ancien n'existe : on reprend celui des draugr
-			// de Bethesda (fer, ébène).
-			"fallback": "Skyrim.esm|0x018ECB" // LItemDraugrShield
+			// Aucun bouclier ancien sans ces mods : un casque ancien à la place, plutôt qu'un bouclier de fer.
+			"fallback": "@ancient_helmet"
 		}
 	},
 

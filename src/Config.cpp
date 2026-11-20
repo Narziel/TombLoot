@@ -67,7 +67,8 @@ Config Config::Load()
 							list.items.push_back({ item.get<std::string>(), 1 });
 						} else if (item.is_object() && item.contains("form") && item["form"].is_string()) {
 							const auto level = item.value("level", 1);
-							list.items.push_back({ item["form"].get<std::string>(), static_cast<std::uint16_t>(std::clamp(level, 1, 255)) });
+							list.items.push_back({ item["form"].get<std::string>(), static_cast<std::uint16_t>(std::clamp(level, 1, 255)),
+								Strings(item, "only_if"), Strings(item, "unless") });
 						}
 					}
 				}

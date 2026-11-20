@@ -49,75 +49,110 @@ namespace Swap
 		// What "@name" points to for this application: the made list, or its fallback when empty.
 		std::map<std::string, RE::TESLevItem*> targets;
 
-		void BuildCreated(const Config& a_config)
+		bool Loaded(const std::string& a_plugin)
 		{
-			targets.clear();
-			auto* factory = RE::IFormFactory::GetConcreteFormFactoryByType<RE::TESLevItem>();
-			for (const auto& [name, spec] : a_config.created) {
-				std::vector<RE::LEVELED_OBJECT> entries;
-				std::uint32_t                   missing = 0;
-				for (const auto& item : spec.items) {
-					auto* form = Forms::Resolve(item.form);
-					if (!form || !(form->Is(RE::FormType::Armor) || form->Is(RE::FormType::Weapon) || form->Is(RE::FormType::LeveledItem))) {
-						++missing;
-						continue;
-					}
-					entries.push_back({ form, 1, item.level, 0, nullptr });
-				}
-				// Nothing at level 1 (the low-level pieces are missing): the fallback fills the low levels,
-				// otherwise the list would give nothing to a low-level player.
-				if (!entries.empty() && std::ranges::none_of(entries, [](const auto& e) { return e.level <= 1; })) {
-					if (auto* fb = Forms::Resolve(spec.fallback); fb && fb->As<RE::TESLevItem>()) {
-						entries.push_back({ fb, 1, 1, 0, nullptr });
-					}
-				}
-				std::ranges::stable_sort(entries, {}, &RE::LEVELED_OBJECT::level);  // the engine reads entries by rising level
-				if (entries.size() > 255) {
-					entries.resize(255);
-				}
-
-				if (entries.empty()) {
-					auto* fb = Forms::Resolve(spec.fallback);
-					targets[name] = fb ? fb->As<RE::TESLevItem>() : nullptr;
-					logger::info("[Created] @{}: no piece loaded ({} missing), fallback {}", name, missing,
-						targets[name] ? Forms::Label(targets[name]) : "none (its replacements are skipped)"s);
-					continue;
-				}
-
-				auto*& list = made[name];
-				if (!list) {
-					list = factory ? factory->Create() : nullptr;
-					if (!list) {
-						logger::error("[Created] @{}: leveled list factory failed, its replacements are skipped", name);
-						continue;
-					}
-				}
-				list->entries.resize(static_cast<std::uint32_t>(entries.size()));
-				for (std::uint32_t i = 0; i < entries.size(); ++i) {
-					list->entries[i] = entries[i];
-				}
-				list->numEntries = static_cast<std::uint8_t>(entries.size());
-				list->chanceNone = spec.chanceNone;
-				list->llFlags = RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel;
-				list->chanceGlobal = nullptr;
-				targets[name] = list;
-
-				std::string text;
-				for (const auto& e : entries) {
-					text += std::format("{}{} (lvl {})", text.empty() ? "" : " ; ", Forms::Named(e.form), e.level);
-				}
-				logger::info("[Created] @{} 0x{:08X}: {} pieces, {} missing: {}", name, list->GetFormID(), entries.size(), missing, text);
-			}
+			auto* dh = RE::TESDataHandler::GetSingleton();
+			return dh && (dh->LookupLoadedModByName(a_plugin) || dh->LookupLoadedLightModByName(a_plugin));
 		}
 
-		RE::TESLevItem* Target(const std::string& a_ref)
+		// "Plugin|0xID" or "@name" (a list made in the first pass).
+		RE::TESLevItem* ResolveList(const std::string& a_ref)
 		{
+			if (a_ref.empty()) {
+				return nullptr;
+			}
 			if (a_ref.starts_with('@')) {
 				auto it = targets.find(a_ref.substr(1));
 				return it != targets.end() ? it->second : nullptr;
 			}
 			auto* form = Forms::Resolve(a_ref);
 			return form ? form->As<RE::TESLevItem>() : nullptr;
+		}
+
+		void Fill(const std::string& a_name, RE::TESLevItem* a_list, std::vector<RE::LEVELED_OBJECT>& a_entries, std::int8_t a_chanceNone,
+			std::uint32_t a_missing)
+		{
+			std::ranges::stable_sort(a_entries, {}, &RE::LEVELED_OBJECT::level);  // the engine reads entries by rising level
+			if (a_entries.size() > 255) {
+				a_entries.resize(255);
+			}
+			a_list->entries.resize(static_cast<std::uint32_t>(a_entries.size()));
+			for (std::uint32_t i = 0; i < a_entries.size(); ++i) {
+				a_list->entries[i] = a_entries[i];
+			}
+			a_list->numEntries = static_cast<std::uint8_t>(a_entries.size());
+			a_list->chanceNone = a_chanceNone;
+			a_list->llFlags = RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel;
+			a_list->chanceGlobal = nullptr;
+
+			std::string text;
+			for (const auto& e : a_entries) {
+				text += std::format("{}{} (lvl {})", text.empty() ? "" : " ; ", Forms::Named(e.form), e.level);
+			}
+			logger::info("[Created] @{} 0x{:08X}: {} pieces, {} skipped: {}", a_name, a_list->GetFormID(), a_entries.size(), a_missing, text);
+		}
+
+		void BuildCreated(const Config& a_config)
+		{
+			targets.clear();
+			auto* factory = RE::IFormFactory::GetConcreteFormFactoryByType<RE::TESLevItem>();
+
+			// 1. The pieces of each list: missing plugin, or condition on the load order not met -> skipped.
+			struct Pending
+			{
+				std::vector<RE::LEVELED_OBJECT> entries;
+				std::uint32_t                   missing{ 0 };
+			};
+			std::map<std::string, Pending> pending;
+			for (const auto& [name, spec] : a_config.created) {
+				auto& p = pending[name];
+				for (const auto& item : spec.items) {
+					const bool wanted = (item.onlyIf.empty() || std::ranges::any_of(item.onlyIf, Loaded)) &&
+					                    std::ranges::none_of(item.unless, Loaded);
+					auto* form = wanted ? Forms::Resolve(item.form) : nullptr;
+					if (!form || !(form->Is(RE::FormType::Armor) || form->Is(RE::FormType::Weapon) || form->Is(RE::FormType::LeveledItem))) {
+						++p.missing;
+						continue;
+					}
+					p.entries.push_back({ form, 1, item.level, 0, nullptr });
+				}
+				if (p.entries.empty()) {
+					continue;
+				}
+				auto*& list = made[name];
+				if (!list) {
+					list = factory ? factory->Create() : nullptr;
+				}
+				if (!list) {
+					logger::error("[Created] @{}: leveled list factory failed, its replacements are skipped", name);
+					continue;
+				}
+				targets[name] = list;
+			}
+
+			// 2. Fallbacks, once every list exists ("@name" allowed): an empty list is replaced by its
+			// fallback; a list with nothing at level 1 gets its fallback at level 1, otherwise it would
+			// give nothing to a low-level player.
+			for (const auto& [name, spec] : a_config.created) {
+				auto& p = pending[name];
+				auto* fallback = ResolveList(spec.fallback);
+				auto  it = targets.find(name);
+				if (it == targets.end()) {
+					targets[name] = fallback;
+					logger::info("[Created] @{}: no piece ({} skipped), fallback {}", name, p.missing,
+						fallback ? Forms::Label(fallback) : "none (its replacements are skipped)"s);
+					continue;
+				}
+				if (fallback && fallback != it->second && std::ranges::none_of(p.entries, [](const auto& e) { return e.level <= 1; })) {
+					p.entries.push_back({ fallback, 1, 1, 0, nullptr });
+				}
+				Fill(name, it->second, p.entries, spec.chanceNone, p.missing);
+			}
+		}
+
+		RE::TESLevItem* Target(const std::string& a_ref)
+		{
+			return ResolveList(a_ref);
 		}
 
 		void ApplyFamily(const char* a_name, const Config::Family& a_family)

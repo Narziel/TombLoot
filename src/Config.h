@@ -25,8 +25,10 @@ struct Config
 	{
 		struct Item
 		{
-			std::string   form;
-			std::uint16_t level{ 1 };
+			std::string              form;
+			std::uint16_t            level{ 1 };
+			std::vector<std::string> onlyIf;  // kept only if one of these plugins is loaded
+			std::vector<std::string> unless;  // skipped if one of these plugins is loaded
 		};
 		std::vector<Item> items;
 		std::string       fallback;
