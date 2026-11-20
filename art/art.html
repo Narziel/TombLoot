@@ -226,15 +226,19 @@ function render() {
       bx += w + 18;
     }
   } else {
-    // Banner: the barrow scaled down on the right, the title on the left.
+    // Banner (Nexus page header): Nexus writes the breadcrumb and the mod name over the
+    // lower left, so that area stays empty and darker; no title in the image, only a
+    // small tagline at the top left. The barrow sits on the right.
     s += `<rect x="0" y="400" width="${W}" height="${H - 400}" fill="url(#floor)"/>`;
     s += `<g transform="translate(751,-24) scale(.55)">${barrow()}</g>`;
     s += `<g filter="url(#mist)" opacity=".5"><ellipse cx="1400" cy="430" rx="700" ry="35" fill="#5c8a94"/></g>`;
     s += particles(90, 1150, 1900, 20, 400, .8, 2.2, '#cff6ff', .7);
     s += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
-    s += title(130, 250, 150, 'start');
-    s += `<line x1="138" y1="285" x2="690" y2="285" stroke="url(#gold)" stroke-width="2" opacity=".7"/>`;
-    s += `<text x="138" y="350" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="52" fill="#d9eef2">Ancient tombs. Ancient loot.</text>`;
+    s += `<defs><radialGradient id="nexusShade" gradientUnits="userSpaceOnUse" cx="0" cy="${H}" r="1100" gradientTransform="translate(0 ${H}) scale(1 .45) translate(0 -${H})">
+      <stop offset="0" stop-color="#03080b" stop-opacity=".8"/><stop offset=".55" stop-color="#03080b" stop-opacity=".4"/><stop offset="1" stop-color="#03080b" stop-opacity="0"/></radialGradient></defs>`;
+    s += `<rect width="${W}" height="${H}" fill="url(#nexusShade)"/>`;
+    s += `<text x="140" y="120" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="54" fill="#d9eef2" filter="url(#textGlow)">Ancient tombs. Ancient loot.</text>`;
+    s += `<line x1="142" y1="148" x2="640" y2="148" stroke="url(#gold)" stroke-width="2" opacity=".7"/>`;
   }
   s += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity="1"/>`;
   s += `</svg>`;
