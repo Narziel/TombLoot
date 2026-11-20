@@ -60,6 +60,41 @@
 		"solstheim_shield": { "extends": "ancient_shield", "items": [
 			{ "form": "Dragonborn.esm|0x026237", "level": 38 }  // DLC2ArmorStalhrimShield
 		] },
+		// Objets enchantés. Armes : les armes anciennes enchantées de Bethesda (givre, boss draugr).
+		"ancient_ench_weapon": { "items": [
+			"Skyrim.esm|0x0DDD62", // LItemDraugr02BossWeapon1HMagic
+			"Skyrim.esm|0x0DDD63"  // LItemDraugr02BossWeapon2HMagic
+		] },
+		// Armures : les sous-listes d'armure nordique antique enchantée d'Ancient Nord Armoury, aux
+		// paliers que le mod leur donne (2, 4, 6). Sans lui, aucune armure ancienne enchantée n'existe :
+		// on donne une arme ancienne enchantée à la place.
+		"ancient_ench_armor": {
+			"items": [
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000961", "level": 2 }, // SublistEnchArmorDraugrCuirass01
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000962", "level": 4 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000963", "level": 6 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000967", "level": 2 }, // SublistEnchArmorDraugrHelmet01
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000968", "level": 4 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000969", "level": 6 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000964", "level": 2 }, // SublistEnchArmorDraugrGauntlets01
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000965", "level": 4 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000966", "level": 6 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x00096A", "level": 2 }, // SublistEnchArmorDraugrBoots01
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x00096B", "level": 4 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x00096C", "level": 6 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x00096E", "level": 2 }, // SublistEnchArmorDraugrShield01
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x00096F", "level": 4 },
+				{ "form": "AncientNordArmo(u)ryEXTREMESE.esp|0x000970", "level": 6 }
+			],
+			"fallback": "Skyrim.esm|0x0DDD62" // LItemDraugr02BossWeapon1HMagic
+		},
+		// Solstheim : les mêmes, plus le stalhrim enchanté de Dragonborn au palier de l'ébène.
+		"solstheim_ench_weapon": { "extends": "ancient_ench_weapon", "items": [
+			{ "form": "Dragonborn.esm|0x037846", "level": 38 } // DLC2LItemEnchStalhrimWeaponAny75
+		] },
+		"solstheim_ench_armor": { "extends": "ancient_ench_armor", "items": [
+			{ "form": "Dragonborn.esm|0x037847", "level": 38 } // DLC2LItemEnchStalhrimArmorAny75
+		] },
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
@@ -88,7 +123,13 @@
 			"Skyrim.esm|0x0C2963",     // LootDraugrArmor10
 			"Skyrim.esm|0x06883B",     // LootDraugrArmor25
 			"Skyrim.esm|0x088514",     // LootDraugrArmor50
-			"Skyrim.esm|0x0B4202"      // LootDraugrArmor100
+			"Skyrim.esm|0x0B4202",     // LootDraugrArmor100
+			"Skyrim.esm|0x0B555E",     // LootDraugrEnchWeapons15
+			"Skyrim.esm|0x0B5563",     // LootDraugrEnchWeapons25
+			"Skyrim.esm|0x01ED1B",     // LootDraugrEnchWeapons100
+			"Skyrim.esm|0x0B5561",     // LootDraugrEnchArmor15
+			"Skyrim.esm|0x0B5562",     // LootDraugrEnchArmor25
+			"Skyrim.esm|0x034902"      // LootDraugrEnchArmor100
 		],
 
 		// Liste générique -> liste d'époque. Seul l'objet de l'entrée change : niveau et nombre restent.
@@ -170,6 +211,26 @@
 					"Skyrim.esm|0x0165E6",                         // LItemArmorShieldAny
 					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099D"   // LItemDraugrandNordicShield
 				]
+			},
+			// Enchantés. Les listes enchantées d'Ancient Nord Armoury passent au nordique gravé enchanté
+			// à partir du niveau 25 : remplacées aussi.
+			{
+				"to": "@ancient_ench_weapon",
+				"from": [
+					"Skyrim.esm|0x04B58C"                          // LItemEnchWeaponAny
+				]
+			},
+			{
+				"to": "@ancient_ench_armor",
+				"from": [
+					"Skyrim.esm|0x0B555F",                         // LItemEnchArmorHeavyAll
+					"Skyrim.esm|0x0B5560",                         // LItemEnchArmorLightAll
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x000960",  // LItemEnchDraugrandNordicHelmet
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099E",  // LItemEnchDraugrandNordicCuirass
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099F",  // LItemEnchDraugrandNordicGauntlets
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A0",  // LItemEnchDraugrandNordicBoots
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A1"   // LItemEnchDraugrandNordicShield
+				]
 			}
 		]
 	},
@@ -180,7 +241,10 @@
 		"lists": [
 			"Dragonborn.esm|0x02C442", // DLC2LootDraugrArmor25
 			"Dragonborn.esm|0x02C443", // DLC2LootDraugrArmor50
-			"Dragonborn.esm|0x02C445"  // DLC2LootDraugrArmor100
+			"Dragonborn.esm|0x02C445", // DLC2LootDraugrArmor100
+			"Dragonborn.esm|0x02C446", // DLC2LootDraugrEnchArmor100
+			"Dragonborn.esm|0x02C447", // DLC2LootDraugrEnchWeapons100
+			"Dragonborn.esm|0x02C44B"  // DLC2LootDraugrChestBossMagicItem25
 		],
 		"replace": [
 			{
@@ -226,6 +290,27 @@
 					"Dragonborn.esm|0x02BC21",                     // DLC2LItemArmorShieldHeavy
 					"Dragonborn.esm|0x02BC22",                     // DLC2LItemArmorShieldLight
 					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099D"   // LItemDraugrandNordicShield
+				]
+			},
+			{
+				"to": "@solstheim_ench_weapon",
+				"from": [
+					"Skyrim.esm|0x04B58C",                         // LItemEnchWeaponAny
+					"Dragonborn.esm|0x02BC0C"                      // DLC2LItemEnchWeaponAny
+				]
+			},
+			{
+				"to": "@solstheim_ench_armor",
+				"from": [
+					"Skyrim.esm|0x0B555F",                         // LItemEnchArmorHeavyAll
+					"Skyrim.esm|0x0B5560",                         // LItemEnchArmorLightAll
+					"Dragonborn.esm|0x02BC00",                     // DLC2LItemEnchArmorHeavyAll
+					"Dragonborn.esm|0x02BC01",                     // DLC2LItemEnchArmorLightAll
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x000960",  // LItemEnchDraugrandNordicHelmet
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099E",  // LItemEnchDraugrandNordicCuirass
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099F",  // LItemEnchDraugrandNordicGauntlets
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A0",  // LItemEnchDraugrandNordicBoots
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A1"   // LItemEnchDraugrandNordicShield
 				]
 			}
 		]

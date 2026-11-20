@@ -50,6 +50,13 @@ namespace Swap
 					}
 					entries.push_back({ form, 1, item.level, 0, nullptr });
 				}
+				// Nothing at level 1 (the low-level pieces are missing): the fallback fills the low levels,
+				// otherwise the list would give nothing to a low-level player.
+				if (!entries.empty() && std::ranges::none_of(entries, [](const auto& e) { return e.level <= 1; })) {
+					if (auto* fb = Forms::Resolve(spec.fallback); fb && fb->As<RE::TESLevItem>()) {
+						entries.push_back({ fb, 1, 1, 0, nullptr });
+					}
+				}
 				std::ranges::stable_sort(entries, {}, &RE::LEVELED_OBJECT::level);  // the engine reads entries by rising level
 				if (entries.size() > 255) {
 					entries.resize(255);
