@@ -145,6 +145,204 @@ function barrow() {
   return s;
 }
 
+// ---------------------------------------------------------------------------
+// Banner: a burial hall in one-point perspective. Nexus lays its breadcrumb, the
+// mod name and the stats over the lower left and its buttons over the lower right,
+// so the subject sits high and right of centre, and the lower left stays dark.
+const hexMix = (a, b, t) => {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const A = p(a), B = p(b);
+  return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+};
+const VX = 1230, VY = 225, HW = 700, FL = 330, SP = 150, AP = 330;
+const hx = (k, u) => VX + u * HW * k;          // u = -1 left wall, +1 right wall
+const hy = (k, v) => VY + v * k;               // v in pixels at k = 1
+function hallArch(k, closed = true) {
+  const L = hx(k, -1), R = hx(k, 1), yF = hy(k, FL), yS = hy(k, -SP), yA = hy(k, -AP);
+  const top = `M${L},${yS} Q${L},${yA} ${VX},${yA} Q${R},${yA} ${R},${yS}`;
+  return closed ? `M${L},${yF} L${L},${yS} Q${L},${yA} ${VX},${yA} Q${R},${yA} ${R},${yS} L${R},${yF} Z` : top;
+}
+// A point on a side wall: t from 0 (near frame k0) to 1 (far frame k1), v vertical.
+const wallPt = (k0, k1, side, t, v) => { const k = k0 + (k1 - k0) * t; return [hx(k, side), hy(k, v)]; };
+
+function draugrInNiche(k0, k1, side, eyes) {
+  // Niche: arched recess in the wall between two frames.
+  const q = (t, v) => wallPt(k0, k1, side, t, v).map((n) => n.toFixed(1)).join(',');
+  let s = `<path d="M${q(.22, 150)} L${q(.22, -60)} Q${q(.22, -125)} ${q(.5, -128)} Q${q(.78, -125)} ${q(.78, -60)} L${q(.78, 150)} Z" fill="#05090b" stroke="#2e444b" stroke-opacity=".5" stroke-width="${(5 * k0).toFixed(1)}"/>`;
+  // Shrouded draugr standing in it, seen at an angle.
+  const [cx, cyTop] = wallPt(k0, k1, side, .5, -95), [, cyBot] = wallPt(k0, k1, side, .5, 150);
+  const kk = (k0 + k1) / 2, h = cyBot - cyTop, w = 110 * kk;
+  s += `<g opacity=".9">
+    <path d="M${cx - w * .32},${cyBot} C${cx - w * .42},${cyTop + h * .45} ${cx - w * .36},${cyTop + h * .2} ${cx - w * .18},${cyTop + h * .17}
+      C${cx - w * .2},${cyTop + h * .02} ${cx + w * .2},${cyTop + h * .02} ${cx + w * .18},${cyTop + h * .17}
+      C${cx + w * .36},${cyTop + h * .2} ${cx + w * .42},${cyTop + h * .45} ${cx + w * .32},${cyBot} Z" fill="url(#shroud)"/>
+    <path d="M${cx - w * .26},${cyTop + h * .42} Q${cx},${cyTop + h * .5} ${cx + w * .26},${cyTop + h * .4} M${cx - w * .28},${cyTop + h * .66} Q${cx},${cyTop + h * .74} ${cx + w * .28},${cyTop + h * .64}"
+      stroke="#05090b" stroke-width="${(4 * kk).toFixed(1)}" fill="none" opacity=".6"/>`;
+  if (eyes) {
+    const ey = cyTop + h * .1, ex = w * .07, r = Math.max(1.6, 5 * kk);
+    s += `<g filter="url(#eyeGlow)"><circle cx="${cx - ex}" cy="${ey}" r="${r}" fill="#c9f6ff"/><circle cx="${cx + ex}" cy="${ey}" r="${r}" fill="#c9f6ff"/></g>`;
+  }
+  return s + '</g>';
+}
+
+function bannerScene() {
+  let s = '';
+  // Front wall of the hall (left of the great arch), dark old stone.
+  s += `<rect width="${W}" height="${H}" fill="#070c0e"/>`;
+  let courses = '';
+  for (let row = 0; row < 12; row++) {
+    const y = row * 44 - 10, off = (row % 2) * 70;
+    for (let x = -off; x < 640; x += 140) courses += `<rect x="${x}" y="${y}" width="${132 + rnd() * 6}" height="38" rx="3" fill-opacity="${(0.25 + rnd() * 0.5).toFixed(2)}"/>`;
+  }
+  s += `<g fill="url(#stone)" stroke="#000" stroke-width="3" opacity=".35" filter="url(#rough)">${courses}</g>`;
+
+  // The hall, carved as nested arches: each frame farther away, colder and lighter.
+  const frames = [1, .76, .57, .43, .32, .235];
+  frames.forEach((k, i) => {
+    const t = i / (frames.length - 1);
+    s += `<path d="${hallArch(k)}" fill="${hexMix('#0d1518', '#1d3d47', t)}"/>`;
+  });
+  // End of the hall: the sealed door, lit from within.
+  const kE = frames[frames.length - 1];
+  s += `<path d="${hallArch(kE)}" fill="url(#hallEnd)"/>`;
+  s += `<g transform="translate(${VX},${hy(kE, -40)})" filter="url(#softGlow)" opacity=".95">
+    <circle r="46" fill="none" stroke="#2b4a52" stroke-width="7"/>
+    <circle r="46" fill="none" stroke="#a8e6f2" stroke-width="1.4" stroke-dasharray="2 6" opacity=".8"/>
+    <circle r="30" fill="none" stroke="#24414a" stroke-width="6"/>
+    <circle r="30" fill="none" stroke="#bff3ff" stroke-width="1" stroke-dasharray="7 4" opacity=".7"/>
+    <path d="M0,-18 L5,-3 L18,0 L5,3 L0,18 L-5,3 L-18,0 L-5,-3 Z" fill="#e6fcff"/>
+  </g>`;
+  s += glyphRow(VX - 95, hy(kE, -205), 8, 12, 27, '#9fd8e6', .4);
+
+  // Floor of each segment, with slab joints running to the vanishing point.
+  for (let i = 0; i < frames.length - 1; i++) {
+    const a = frames[i], b = frames[i + 1], t = i / (frames.length - 1);
+    s += `<path d="M${hx(a, -1)},${hy(a, FL)} L${hx(a, 1)},${hy(a, FL)} L${hx(b, 1)},${hy(b, FL)} L${hx(b, -1)},${hy(b, FL)} Z" fill="${hexMix('#0a1114', '#22424b', t)}"/>`;
+  }
+  let joints = '';
+  for (let u = -1; u <= 1.001; u += 2 / 9) joints += `<line x1="${hx(1, u)}" y1="${hy(1, FL)}" x2="${hx(kE, u)}" y2="${hy(kE, FL)}"/>`;
+  for (const k of [.9, .68, .5, .37, .27]) joints += `<line x1="${hx(k, -1)}" y1="${hy(k, FL)}" x2="${hx(k, 1)}" y2="${hy(k, FL)}"/>`;
+  s += `<g stroke="#000" stroke-width="2.5" opacity=".4">${joints}</g>`;
+
+  // Burial niches with their sleepers, farthest first. Some of them are awake.
+  const eyesOn = [[1, 0], [0, 1], [1, 1], [0, 0], [1, 0]];
+  for (let i = frames.length - 2; i >= 1; i--) {
+    s += draugrInNiche(frames[i], frames[i + 1], -1, eyesOn[i][0]);
+    s += draugrInNiche(frames[i], frames[i + 1], 1, eyesOn[i][1]);
+  }
+
+  // Ribs and pilasters of every frame, far to near; the near ones catch the firelight.
+  for (let i = frames.length - 1; i >= 0; i--) {
+    const k = frames[i], t = i / (frames.length - 1), w = (i === 0 ? 70 : 46) * k;
+    const col = i === 0 ? '#121a1d' : hexMix('#1a2529', '#2c4b54', t);
+    s += `<path d="${hallArch(k, false)}" fill="none" stroke="#04080a" stroke-width="${w * 1.25}"/>`;
+    s += `<path d="${hallArch(k, false)}" fill="none" stroke="${col}" stroke-width="${w}" filter="url(#rough)"/>`;
+    s += `<path d="${hallArch(k, false)}" fill="none" stroke="#9fd8e6" stroke-width="${Math.max(1, 2.2 * k)}" opacity="${(.15 + .35 * t).toFixed(2)}" transform="translate(0,${w * .45})"/>`;
+    for (const side of [-1, 1]) {
+      s +=`<rect x="${(hx(k, side) - w / 2).toFixed(1)}" y="${hy(k, -SP)}" width="${w.toFixed(1)}" height="${(hy(k, FL) - hy(k, -SP)).toFixed(1)}" fill="${col}" stroke="#04080a" stroke-width="${(3 * k).toFixed(1)}" filter="url(#rough)"/>`;
+    }
+  }
+
+  // Cold light: rays from the open coffer, pool on the floor, mist along the floor.
+  const CX = VX, CY = 386;                       // bottom centre of the coffer
+  s += `<g style="mix-blend-mode:screen" opacity=".85">
+    <polygon points="${CX - 70},${CY - 72} ${CX + 70},${CY - 72} ${CX + 260},-20 ${CX - 260},-20" fill="url(#ray)"/>
+    <polygon points="${CX - 30},${CY - 72} ${CX + 30},${CY - 72} ${CX + 90},-20 ${CX - 90},-20" fill="url(#ray)" opacity=".9"/>
+    <polygon points="${CX - 10},${CY - 72} ${CX + 10},${CY - 72} ${CX + 430},20 ${CX + 380},10" fill="url(#ray)" opacity=".3"/>
+    <polygon points="${CX - 10},${CY - 72} ${CX + 10},${CY - 72} ${CX - 380},10 ${CX - 430},20" fill="url(#ray)" opacity=".3"/>
+  </g>`;
+  s += `<ellipse cx="${CX}" cy="${CY + 6}" rx="380" ry="46" fill="url(#pool)" style="mix-blend-mode:screen"/>`;
+  s += particles(140, CX - 260, CX + 260, 10, CY - 60, .6, 2, '#dff9ff', .75);
+
+  // Pedestals with the relics of the two other ages: Dwemer bronze, Solstheim stalhrim.
+  const pedestal = (x, glow) => `<g>
+    <ellipse cx="${x}" cy="${CY - 120}" rx="70" ry="60" fill="${glow}" opacity=".22" filter="url(#bigGlow)"/>
+    <path d="M${x - 34},${CY - 8} L${x + 34},${CY - 8} L${x + 26},${CY - 18} L${x + 20},${CY - 82} L${x + 30},${CY - 92} L${x - 30},${CY - 92} L${x - 20},${CY - 82} L${x - 26},${CY - 18} Z" fill="url(#chest)" stroke="#071014" stroke-width="3" filter="url(#rough)"/>
+    <path d="M${x - 20},${CY - 60} L${x + 20},${CY - 60}" stroke="#7fb7c4" stroke-width="1.5" opacity=".4"/>
+  </g>`;
+  const PL = CX - 235, PR = CX + 235;
+  s += pedestal(PL, '#ffb45c') + pedestal(PR, '#7ff5e0');
+  // Dwarven cog-shield, bronze, standing on its rim.
+  let teeth = '';
+  for (let a = 0; a < 12; a++) teeth += `<rect x="-6" y="-44" width="12" height="12" rx="2" transform="rotate(${a * 30})"/>`;
+  s += `<g transform="translate(${PL},${CY - 128})" filter="url(#softGlow)">
+    <g fill="#b9772e" stroke="#3a2210" stroke-width="2">${teeth}</g>
+    <circle r="35" fill="url(#bronze)" stroke="#3a2210" stroke-width="3"/>
+    <circle r="22" fill="none" stroke="#ffd79a" stroke-width="2" opacity=".7"/>
+    <circle r="9" fill="#5a3416" stroke="#ffd79a" stroke-width="1.5"/>
+    <path d="M0,-22 L0,22 M-22,0 L22,0" stroke="#3a2210" stroke-width="3" opacity=".6"/>
+  </g>`;
+  // Stalhrim shards, translucent green ice.
+  s += `<g transform="translate(${PR},${CY - 92})" filter="url(#softGlow)">
+    <polygon points="-6,0 -14,-52 -2,-78 6,-50 4,0" fill="url(#stalhrim)" stroke="#d9fff6" stroke-width="1.2"/>
+    <polygon points="4,0 10,-40 26,-62 24,-30 16,0" fill="url(#stalhrim)" stroke="#d9fff6" stroke-width="1.2" opacity=".9"/>
+    <polygon points="-16,0 -30,-30 -26,-50 -12,-22 -8,0" fill="url(#stalhrim)" stroke="#d9fff6" stroke-width="1.2" opacity=".85"/>
+    <path d="M-2,-74 L0,-8 M18,-56 L12,-4" stroke="#ffffff" stroke-width="1" opacity=".6"/>
+  </g>`;
+
+  // The Ancient Nord coffer, lid pushed aside, frost light pouring out.
+  s += `<g transform="translate(${CX},${CY}) scale(.62) translate(-1180,-776)">
+    <path d="M1030,600 L1330,600 L1352,560 L1052,548 Z" fill="#26343a" stroke="#0a1114" stroke-width="4" filter="url(#rough)"/>
+    <path d="M1052,548 L1352,560 L1360,540 L1060,526 Z" fill="#33464d" stroke="#0a1114" stroke-width="3"/>
+    <ellipse cx="1180" cy="652" rx="150" ry="22" fill="#e9fbff" filter="url(#bigGlow)"/>
+    <path d="M1030,640 L1330,640 L1316,776 L1044,776 Z" fill="url(#chest)" stroke="#071014" stroke-width="5" filter="url(#rough)"/>
+    <path d="M1030,640 L1330,640 L1330,662 L1030,662 Z" fill="#3c535b" stroke="#071014" stroke-width="3"/>
+    <path d="M1060,690 L1300,690" stroke="#7fb7c4" stroke-width="2" opacity=".5" stroke-dasharray="18 10"/>
+    ${glyphRow(1086, 712, 8, 18, 27, '#a9e9f6', .55)}
+    <circle cx="1180" cy="708" r="17" fill="#0f1c20" stroke="#8fd3e3" stroke-width="2" opacity=".9"/>
+    <g transform="translate(1268,532)">
+      <path d="M-44,0 C-44,-46 44,-46 44,0 Z" fill="url(#helm)" stroke="#0a1114" stroke-width="3"/>
+      <path d="M-40,-14 C-70,-24 -78,-56 -66,-80 C-62,-52 -48,-38 -30,-30 Z" fill="#cdbb9a" stroke="#2a2218" stroke-width="2"/>
+      <path d="M40,-14 C70,-24 78,-56 66,-80 C62,-52 48,-38 30,-30 Z" fill="#cdbb9a" stroke="#2a2218" stroke-width="2"/>
+    </g>
+    ${particles(30, 1060, 1300, 590, 650, 2.5, 6, '#ffd68a', .95)}
+  </g>`;
+  // Ancient Nord sword driven into the floor beside it, hilt up.
+  s += `<g transform="translate(${CX - 128},${CY - 112}) rotate(174) scale(.33)" filter="url(#softGlow)">
+    <path d="M-11,-12 L-14,-300 L-4,-318 L-10,-336 L4,-372 L10,-336 L14,-300 L11,-12 Z" fill="url(#blade)" stroke="#0c1518" stroke-width="4"/>
+    <path d="M-3,-20 L-3,-320" stroke="#e8fbff" stroke-width="3" opacity=".55"/>
+    <path d="M-52,-6 C-40,-24 -20,-14 0,-14 C20,-14 40,-24 52,-6 C34,-6 18,2 0,2 C-18,2 -34,-6 -52,-6 Z" fill="#2a2420" stroke="#0c0a09" stroke-width="4"/>
+    <rect x="-7" y="2" width="14" height="66" rx="4" fill="#3a2a20" stroke="#0c0a09" stroke-width="4"/>
+    <circle cx="0" cy="74" r="11" fill="#2a2420" stroke="#0c0a09" stroke-width="4"/>
+  </g>`;
+
+  // Wall torches on the second frame, warm against the cold hall.
+  for (const side of [-1, 1]) {
+    const k = frames[1], x = hx(k, side) - side * 46 * k, y = hy(k, -40);
+    s += `<g transform="translate(${x},${y})">
+      <ellipse cx="0" cy="-30" rx="170" ry="150" fill="url(#fireGlow)" style="mix-blend-mode:screen"/>
+      <path d="M-16,-6 L16,-6 L9,14 L-9,14 Z" fill="#1c1310" stroke="#3a261c" stroke-width="2"/>
+      <rect x="-3" y="14" width="6" height="26" fill="#160f0c"/>
+      <path d="M-14,-6 C-16,-30 -4,-36 -2,-56 C4,-38 13,-34 14,-6 Z" fill="url(#flame)" filter="url(#softGlow)"/>
+      <path d="M-6,-6 C-7,-20 0,-24 1,-38 C4,-26 8,-20 6,-6 Z" fill="#ffe6a8" opacity=".9"/>
+    </g>`;
+  }
+
+  // Roots hanging through the vault.
+  let roots = '';
+  // Tapered: each root is a thin filled sliver, a few with small side hairs.
+  for (let i = 0; i < 16; i++) {
+    const x = 620 + rnd() * 1260, len = 25 + rnd() * 95, sw = (rnd() - .5) * 26, w0 = 2 + rnd() * 3;
+    roots += `<path d="M${x - w0},-4 C${x - w0 + sw},${len * .4} ${x - sw * .6},${len * .75} ${x + sw * .4},${len} C${x - sw * .6 + 1},${len * .75} ${x + w0 + sw},${len * .4} ${x + w0},-4 Z"/>`;
+    if (rnd() < .5) { const y = len * (.3 + rnd() * .3), d = (rnd() < .5 ? -1 : 1) * (8 + rnd() * 14); roots += `<path d="M${x + sw * .3},${y} q${d * .5},${6} ${d},${14 + rnd() * 10}" fill="none" stroke="#0a0d0e" stroke-width="1.2"/>`; }
+  }
+  s += `<g fill="#0a0d0e" opacity=".85">${roots}</g>`;
+
+  // Floor mist, drifting out of the hall.
+  s += `<g filter="url(#mist)" opacity=".55">
+    <ellipse cx="${VX}" cy="${CY + 30}" rx="620" ry="40" fill="#5c8a94"/>
+    <ellipse cx="${VX + 420}" cy="${CY + 60}" rx="420" ry="40" fill="#4b7882"/>
+    <ellipse cx="${VX - 520}" cy="${CY + 70}" rx="360" ry="34" fill="#3d6670"/>
+  </g>`;
+
+  // The great front arch and its pillar, almost black, rimmed with cold light.
+  const L1 = hx(1, -1);
+  s += `<path d="M0,0 L${L1 - 35},0 L${L1 - 35},${H} L0,${H} Z" fill="url(#frontShade)"/>`;
+  // Cold rim light on the inner edge of the front pillar.
+  s += `<rect x="${L1 + 33}" y="${hy(1, -SP)}" width="2.5" height="${H}" fill="#8fd3e3" opacity=".3"/>`;
+  return s;
+}
+
 function defs() {
   return `<defs>
     <radialGradient id="sky" cx="62%" cy="58%" r="75%">
@@ -171,6 +369,14 @@ function defs() {
     </linearGradient>
     <radialGradient id="wallFade" cx="1180" cy="700" r="620" gradientUnits="userSpaceOnUse"><stop offset=".25" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
     <mask id="wallMask" maskUnits="userSpaceOnUse" x="0" y="0" width="2400" height="1200"><rect x="0" y="0" width="2400" height="1200" fill="url(#wallFade)"/></mask>
+    <linearGradient id="shroud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d757b"/><stop offset=".5" stop-color="#34474c"/><stop offset="1" stop-color="#121b1e"/></linearGradient>
+    <radialGradient id="hallEnd" cx="50%" cy="60%" r="65%"><stop offset="0" stop-color="#7fd0e2"/><stop offset=".45" stop-color="#2a6878"/><stop offset="1" stop-color="#10262d"/></radialGradient>
+    <radialGradient id="bronze" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffd08a"/><stop offset=".5" stop-color="#c07a30"/><stop offset="1" stop-color="#5a3416"/></radialGradient>
+    <linearGradient id="stalhrim" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#2f8f84" stop-opacity=".9"/><stop offset=".6" stop-color="#8ff3dc" stop-opacity=".85"/><stop offset="1" stop-color="#e6fff8" stop-opacity=".95"/></linearGradient>
+    <linearGradient id="frontShade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity=".1"/></linearGradient>
+    <filter id="eyeGlow" x="-300%" y="-300%" width="700%" height="700%">
+      <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
     <radialGradient id="vignette" cx="50%" cy="50%" r="72%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></radialGradient>
     <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
       <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="4" result="n"/>
@@ -229,16 +435,14 @@ function render() {
     // Banner (Nexus page header): Nexus writes the breadcrumb and the mod name over the
     // lower left, so that area stays empty and darker; no title in the image, only a
     // small tagline at the top left. The barrow sits on the right.
-    s += `<rect x="0" y="400" width="${W}" height="${H - 400}" fill="url(#floor)"/>`;
-    s += `<g transform="translate(751,-24) scale(.55)">${barrow()}</g>`;
-    s += `<g filter="url(#mist)" opacity=".5"><ellipse cx="1400" cy="430" rx="700" ry="35" fill="#5c8a94"/></g>`;
-    s += particles(90, 1150, 1900, 20, 400, .8, 2.2, '#cff6ff', .7);
-    s += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
+    s += bannerScene();
+    s += `<rect width="${W}" height="${H}" fill="url(#vignette)" opacity=".7"/>`;
     s += `<defs><radialGradient id="nexusShade" gradientUnits="userSpaceOnUse" cx="0" cy="${H}" r="1100" gradientTransform="translate(0 ${H}) scale(1 .45) translate(0 -${H})">
       <stop offset="0" stop-color="#03080b" stop-opacity=".8"/><stop offset=".55" stop-color="#03080b" stop-opacity=".4"/><stop offset="1" stop-color="#03080b" stop-opacity="0"/></radialGradient></defs>`;
     s += `<rect width="${W}" height="${H}" fill="url(#nexusShade)"/>`;
-    s += `<text x="140" y="120" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="54" fill="#d9eef2" filter="url(#textGlow)">Ancient tombs. Ancient loot.</text>`;
-    s += `<line x1="142" y1="148" x2="640" y2="148" stroke="url(#gold)" stroke-width="2" opacity=".7"/>`;
+    s += `<text x="200" y="118" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="46" fill="#d9eef2" filter="url(#textGlow)">Ancient tombs.</text>`;
+    s += `<text x="232" y="170" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="46" fill="url(#gold)" filter="url(#textGlow)">Ancient loot.</text>`;
+    s += `<line x1="202" y1="192" x2="470" y2="192" stroke="url(#gold)" stroke-width="2" opacity=".6"/>`;
   }
   s += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity="1"/>`;
   s += `</svg>`;
