@@ -97,7 +97,7 @@ namespace Swap
 					list->entries[i] = entries[i];
 				}
 				list->numEntries = static_cast<std::uint8_t>(entries.size());
-				list->chanceNone = 0;
+				list->chanceNone = spec.chanceNone;
 				list->llFlags = RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel;
 				list->chanceGlobal = nullptr;
 				targets[name] = list;
@@ -202,7 +202,8 @@ namespace Swap
 	{
 		Restore();
 		BuildCreated(a_config);
-		ApplyFamily("nordic", a_config.nordic);
-		ApplyFamily("solstheim", a_config.solstheim);
+		for (const auto& [name, family] : a_config.families) {
+			ApplyFamily(name.c_str(), family);
+		}
 	}
 }

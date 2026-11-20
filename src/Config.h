@@ -31,13 +31,14 @@ struct Config
 		std::vector<Item> items;
 		std::string       fallback;
 		std::string       extends;  // name of another created list whose pieces come first
+		std::int8_t       chanceNone{ 0 };  // percent; keeps the chance of a list it replaces (10 % special loot)
 	};
 
 	bool                               survey{ true };
 	std::vector<std::string>           ancientPlugins;
 	std::map<std::string, CreatedList> created;
-	Family                             nordic;     // crypts of Skyrim
-	Family                             solstheim;  // crypts of Solstheim (Dragonborn lists)
+	// Families applied in this order: nordic (crypts of Skyrim), solstheim (Dragonborn lists), dwemer…
+	std::vector<std::pair<std::string, Family>> families;
 
 	// Reads the file; on a missing or invalid file, keeps the defaults (nothing replaced) and says so.
 	static Config Load();

@@ -74,6 +74,7 @@ Config Config::Load()
 				if (auto fb = value.find("fallback"); fb != value.end() && fb->is_string()) {
 					list.fallback = fb->get<std::string>();
 				}
+				list.chanceNone = static_cast<std::int8_t>(std::clamp(value.value("chance_none", 0), 0, 100));
 				if (auto ex = value.find("extends"); ex != value.end() && ex->is_string()) {
 					list.extends = ex->get<std::string>();
 				}
@@ -95,14 +96,21 @@ Config Config::Load()
 				}
 			}
 		}
-		cfg.nordic = ReadFamily(json, "nordic");
-		cfg.solstheim = ReadFamily(json, "solstheim");
+		for (const char* name : { "nordic", "solstheim", "dwemer" }) {
+			if (json.contains(name)) {
+				cfg.families.emplace_back(name, ReadFamily(json, name));
+			}
+		}
 	} catch (const std::exception& e) {
 		logger::error("[Config] {} is invalid ({}): nothing will be replaced", kFile.string(), e.what());
 		return Config{};
 	}
-	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists, nordic {} lists / {} replacements, solstheim {} lists / {} replacements",
-		cfg.survey, cfg.ancientPlugins.size(), cfg.created.size(), cfg.nordic.lists.size(), cfg.nordic.replace.size(), cfg.solstheim.lists.size(),
-		cfg.solstheim.replace.size());
+	std::string families;
+	for (const auto& [name, family] : cfg.families) {
+		families += std::format("{}{} {} lists / {} chests / {} replacements", families.empty() ? "" : ", ", name, family.lists.size(),
+			family.containers.size(), family.replace.size());
+	}
+	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists; {}", cfg.survey, cfg.ancientPlugins.size(),
+		cfg.created.size(), families.empty() ? "no family"s : families);
 	return cfg;
 }

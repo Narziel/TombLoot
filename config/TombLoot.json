@@ -115,6 +115,43 @@
 			{ "form": "Dragonborn.esm|0x037846", "level": 38 }, // DLC2LItemEnchStalhrimWeaponAny75
 			{ "form": "Dragonborn.esm|0x037847", "level": 38 }  // DLC2LItemEnchStalhrimArmorAny75
 		] },
+		// Ruines dwemer. Armes enchantées : les armes dwemer enchantées de Bethesda.
+		"dwemer_ench_weapon": { "items": [
+			"Skyrim.esm|0x0C9A36", // LItemEnchDwarvenSword
+			"Skyrim.esm|0x0C9A37", // LItemEnchDwarvenWarAxe
+			"Skyrim.esm|0x0C9A35", // LItemEnchDwarvenMace
+			"Skyrim.esm|0x0C9A33", // LItemEnchDwarvenDagger
+			"Skyrim.esm|0x0C9A34", // LItemEnchDwarvenGreatSword
+			"Skyrim.esm|0x0C9A31", // LItemEnchDwarvenBattleaxe
+			"Skyrim.esm|0x0C9A38", // LItemEnchDwarvenWarhammer
+			"Skyrim.esm|0x0C9A32"  // LItemEnchDwarvenBow
+		] },
+		// Armures enchantées : les sous-listes d'armure dwemer enchantée de Bethesda, trois paliers.
+		"dwemer_ench_armor": { "items": [
+			"Skyrim.esm|0x08B64A", { "form": "Skyrim.esm|0x08B64B", "level": 15 }, { "form": "Skyrim.esm|0x08B64C", "level": 17 }, // cuirasse
+			"Skyrim.esm|0x08B650", { "form": "Skyrim.esm|0x08B651", "level": 15 }, { "form": "Skyrim.esm|0x08B652", "level": 17 }, // casque
+			"Skyrim.esm|0x08B64D", { "form": "Skyrim.esm|0x08B64E", "level": 15 }, { "form": "Skyrim.esm|0x08B64F", "level": 17 }, // gantelets
+			"Skyrim.esm|0x08B647", { "form": "Skyrim.esm|0x08B648", "level": 15 }, { "form": "Skyrim.esm|0x08B649", "level": 17 }, // bottes
+			"Skyrim.esm|0x08B653", { "form": "Skyrim.esm|0x08FFEF", "level": 15 }, { "form": "Skyrim.esm|0x08FFF0", "level": 17 }  // bouclier
+		] },
+		// Butin spécial des coffres dwemer : armes dwemer enchantées des boss, armure dwemer au meilleur
+		// enchantement, et la part d'objets divers du butin spécial de Bethesda.
+		"dwemer_special": { "items": [
+			"Skyrim.esm|0x0DDD8C", // LItemEnchDwarvenSwordBoss
+			"Skyrim.esm|0x0DDD9C", // LItemEnchDwarvenWarAxeBoss
+			"Skyrim.esm|0x0DDD94", // LItemEnchDwarvenMaceBoss
+			"Skyrim.esm|0x0DDD7C", // LItemEnchDwarvenGreatSwordBoss
+			"Skyrim.esm|0x0DDD73", // LItemEnchDwarvenBattleaxeBoss
+			"Skyrim.esm|0x0DDD84", // LItemEnchDwarvenWarhammerBoss
+			"Skyrim.esm|0x08B64C", // SublistEnchArmorDwarvenCuirass04
+			"Skyrim.esm|0x08B652", // SublistEnchArmorDwarvenHelmet04
+			"Skyrim.esm|0x08B64F", // SublistEnchArmorDwarvenGauntlets04
+			"Skyrim.esm|0x08B649", // SublistEnchArmorDwarvenBoots04
+			"Skyrim.esm|0x08FFF0", // SublistEnchArmorDwarvenShield04
+			"Skyrim.esm|0x10FCEF"  // objets divers du butin spécial
+		] },
+		// Le butin spécial à 10 % garde sa chance : 90 % de ne rien donner.
+		"dwemer_special10": { "extends": "dwemer_special", "chance_none": 90, "items": [] },
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
@@ -424,6 +461,61 @@
 					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A0",  // LItemEnchDraugrandNordicBoots
 					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A1"   // LItemEnchDraugrandNordicShield
 				]
+			}
+		]
+		},
+
+	"dwemer": {
+		// Ruines dwemer : Open World Loot y met les listes dwemer, le Bashed Patch y remet les listes
+		// génériques. Elles deviennent dwemer.
+		"lists": [
+			"Skyrim.esm|0x070C0B",     // LootDwarvenArmor100
+			"Skyrim.esm|0x070C0C",     // LootDwarvenArmor15
+			"Skyrim.esm|0x10A286",     // LootDwarvenArmor25
+			"Skyrim.esm|0x070C1D",     // LootDwarvenWeapon100
+			"Skyrim.esm|0x070C1E",     // LootDwarvenWeapon15
+			"Skyrim.esm|0x070C10",     // LootDwarvenEnchArmor100
+			"Skyrim.esm|0x070C11",     // LootDwarvenEnchArmor20
+			"Skyrim.esm|0x070C12",     // LootDwarvenEnchWeapons100
+			"Skyrim.esm|0x070C13"      // LootDwarvenEnchWeapons20
+		],
+		// Le butin spécial (100 % et 10 %) est partagé avec d'autres coffres : remplacé dans ceux-ci seulement.
+		"containers": [
+			"Skyrim.esm|0x020652",     // TreasDwarvenChestBoss
+			"Skyrim.esm|0x02069A",     // TreasDwarvenChestLarge
+			"Skyrim.esm|0x020650"      // TreasDwarvenChestSmall
+		],
+		"replace": [
+			{
+				"to": "Skyrim.esm|0x070C21", // LItemDwarvenOnlyWeapons
+				"from": [
+					"Skyrim.esm|0x016578", "Skyrim.esm|0x016579", "Skyrim.esm|0x016577", "Skyrim.esm|0x017178", "Skyrim.esm|0x0165BA",
+					"Skyrim.esm|0x01657C", "Skyrim.esm|0x01657A", "Skyrim.esm|0x0165B8", "Skyrim.esm|0x0165B9", "Skyrim.esm|0x017024"
+				]
+			},
+			{
+				"to": "Skyrim.esm|0x070C0D", // LootDwarvenArrows100
+				"from": [ "Skyrim.esm|0x068839" ] // LItemArrowsAll
+			},
+			{
+				"to": "Skyrim.esm|0x070C20", // LItemDwarvenOnlyArmor
+				"from": [ "Skyrim.esm|0x0165E6", "Skyrim.esm|0x016739", "Skyrim.esm|0x01673C", "Skyrim.esm|0x016742", "Skyrim.esm|0x016743" ]
+			},
+			{
+				"to": "@dwemer_ench_weapon",
+				"from": [ "Skyrim.esm|0x04B58C" ] // LItemEnchWeaponAny
+			},
+			{
+				"to": "@dwemer_ench_armor",
+				"from": [ "Skyrim.esm|0x0B555F", "Skyrim.esm|0x0B5560" ] // LItemEnchArmorHeavyAll, LightAll
+			},
+			{
+				"to": "@dwemer_special",
+				"from": [ "Skyrim.esm|0x1031D0" ] // butin spécial 100 %
+			},
+			{
+				"to": "@dwemer_special10",
+				"from": [ "Skyrim.esm|0x10B2C0" ] // butin spécial 10 %
 			}
 		]
 	}
