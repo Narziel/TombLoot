@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TombLoot art</title>
+
+<link href="fonts/fonts.css" rel="stylesheet"><!-- downloaded by render.ps1 -->
+<style>
+  html, body { margin: 0; padding: 0; background: #020405; overflow: hidden; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<div id="out"></div>
+<script>
+// TombLoot key art and Nexus banner, drawn in SVG. Render with Edge headless:
+//   see render.ps1 (Edge headless, ?key at 1920x1080, ?banner at 1920x480)
+const layout = location.search.includes('banner') ? 'banner' : 'key';
+const W = 1920, H = layout === 'banner' ? 480 : 1080;
+
+// Deterministic random, so every render is the same picture.
+let seed = 7;
+const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+function particles(n, x0, x1, y0, y1, rMin, rMax, color, op) {
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const x = x0 + rnd() * (x1 - x0), y = y0 + rnd() * (y1 - y0), r = rMin + rnd() * (rMax - rMin);
+    s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="${color}" opacity="${(op * (0.35 + rnd() * 0.65)).toFixed(2)}"/>`;
+  }
+  return s;
+}
+
+// Claw-scratch glyphs: three-stroke marks, an original take on carved barrow script.
+function glyphRow(x, y, count, size, gap, color, op) {
+  let s = '';
+  for (let i = 0; i < count; i++) {
+    const cx = x + i * gap;
+    const strokes = 2 + Math.floor(rnd() * 3);
+    for (let k = 0; k < strokes; k++) {
+      const a = -0.9 + rnd() * 1.8;
+      const x1 = cx + (rnd() - 0.5) * size * 0.6, y1 = y - size / 2 + rnd() * size * 0.3;
+      const x2 = x1 + Math.sin(a) * size * 0.7, y2 = y1 + Math.cos(a) * size * 0.8;
+      s += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+    }
+  }
+  return `<g stroke="${color}" stroke-width="${(size / 9).toFixed(1)}" stroke-linecap="round" opacity="${op}">${s}</g>`;
+}
+
+// The barrow: arch, chest, sword, braziers. Drawn in "key" coordinates (1920x1080),
+// centred on the chest at (1180, 700).
+function barrow() {
+  let s = '';
+  // Back wall: stone courses behind the arch.
+  let wall = '';
+  for (let row = 0; row < 14; row++) {
+    const y = 120 + row * 46, off = (row % 2) * 60;
+    for (let x = 700 - off; x < 1700; x += 120) {
+      wall += `<rect x="${x}" y="${y}" width="${112 + rnd() * 6}" height="40" rx="3" fill-opacity="${(0.35 + rnd() * 0.65).toFixed(2)}"/>`;
+    }
+  }
+  s += `<g mask="url(#wallMask)"><g fill="url(#stone)" stroke="#000" stroke-opacity=".55" stroke-width="3" opacity=".55" filter="url(#rough)">${wall}</g></g>`;
+  // The wall fades into darkness upwards and to the sides.
+
+  // Great arch (outer frame, carved band, dark opening with cold light).
+  const arch = (ox) => `M${900 - ox},770 L${900 - ox},430 Q${900 - ox},${205 - ox * .8} 1180,${140 - ox} Q${1460 + ox},${205 - ox * .8} ${1460 + ox},430 L${1460 + ox},770 Z`;
+  s += `<path d="${arch(70)}" fill="url(#stoneDark)" stroke="#05090b" stroke-width="6" filter="url(#rough)"/>`;
+  s += `<path d="${arch(70)}" fill="none" stroke="url(#rim)" stroke-width="3" opacity=".8"/>`;
+  s += `<path d="${arch(38)}" fill="none" stroke="#0a1418" stroke-width="22" opacity=".9"/>`;
+  s += `<path d="${arch(38)}" fill="none" stroke="#6f8f96" stroke-width="2" stroke-dasharray="2 14" opacity=".55"/>`;
+  s += `<path d="${arch(0)}" fill="url(#void)"/>`;
+  // Carved glyphs along the lintel.
+  s += glyphRow(1000, 300, 12, 26, 33, '#9fd8e6', .35);
+
+  // Ring seal above the chest, inside the opening (concentric carved rings).
+  s += `<g transform="translate(1180,360)" opacity=".85" filter="url(#softGlow)">
+    <circle r="120" fill="none" stroke="#2b4a52" stroke-width="16"/>
+    <circle r="120" fill="none" stroke="#8fd3e3" stroke-width="2" stroke-dasharray="3 9" opacity=".7"/>
+    <circle r="84" fill="none" stroke="#24414a" stroke-width="14"/>
+    <circle r="84" fill="none" stroke="#a8e6f2" stroke-width="1.5" stroke-dasharray="12 6" opacity=".6"/>
+    <circle r="48" fill="#0d1d22" stroke="#2f5560" stroke-width="10"/>
+    <path d="M0,-30 L9,-4 L30,0 L9,4 L0,30 L-9,4 L-30,0 L-9,-4 Z" fill="#bff3ff" opacity=".85"/>
+  </g>`;
+
+  // God rays rising from the open chest.
+  s += `<g style="mix-blend-mode:screen" opacity=".9">
+    <polygon points="1120,650 1240,650 1420,140 940,140" fill="url(#ray)"/>
+    <polygon points="1150,650 1210,650 1300,180 1060,180" fill="url(#ray)" opacity=".8"/>
+    <polygon points="1165,650 1195,650 1560,260 1490,250" fill="url(#ray)" opacity=".35"/>
+    <polygon points="1165,650 1195,650 870,250 800,260" fill="url(#ray)" opacity=".35"/>
+  </g>`;
+
+  // Floor slabs.
+  let slabs = '';
+  for (let i = -10; i <= 6; i++) {
+    slabs += `<line x1="${1180 + i * 60}" y1="770" x2="${1180 + i * 260}" y2="1080"/>`;
+  }
+  for (const y of [810, 870, 950, 1050]) slabs += `<line x1="-600" y1="${y}" x2="1960" y2="${y}"/>`;
+  s += `<g stroke="#000" stroke-width="3" opacity=".45">${slabs}</g>`;
+  s += `<ellipse cx="1180" cy="790" rx="420" ry="70" fill="url(#pool)" style="mix-blend-mode:screen"/>`;
+
+  // Braziers, warm against the cold light.
+  for (const bx of [790, 1570]) {
+    s += `<g transform="translate(${bx},720)">
+      <ellipse cx="0" cy="-70" rx="150" ry="150" fill="url(#fireGlow)" style="mix-blend-mode:screen"/>
+      <path d="M-34,-40 L34,-40 L22,0 L-22,0 Z" fill="#1c1310" stroke="#3a261c" stroke-width="3"/>
+      <rect x="-6" y="0" width="12" height="62" fill="#160f0c"/>
+      <path d="M-30,62 L30,62 L18,50 L-18,50 Z" fill="#160f0c"/>
+      <path d="M-26,-40 C-30,-80 -8,-88 -4,-120 C6,-92 24,-90 26,-40 Z" fill="url(#flame)" filter="url(#softGlow)"/>
+      <path d="M-12,-40 C-14,-66 0,-72 2,-96 C8,-74 16,-66 12,-40 Z" fill="#ffe6a8" opacity=".9"/>
+    </g>`;
+  }
+
+  // The chest: stone coffer, lid pushed open, frost light pouring out.
+  s += `<g>
+    <path d="M1030,600 L1330,600 L1352,560 L1052,548 Z" fill="#26343a" stroke="#0a1114" stroke-width="4" filter="url(#rough)"/>
+    <path d="M1052,548 L1352,560 L1360,540 L1060,526 Z" fill="#33464d" stroke="#0a1114" stroke-width="3"/>
+    <ellipse cx="1180" cy="652" rx="150" ry="22" fill="#e9fbff" filter="url(#bigGlow)"/>
+    <path d="M1030,640 L1330,640 L1316,776 L1044,776 Z" fill="url(#chest)" stroke="#071014" stroke-width="5" filter="url(#rough)"/>
+    <path d="M1030,640 L1330,640 L1330,662 L1030,662 Z" fill="#3c535b" stroke="#071014" stroke-width="3"/>
+    <path d="M1060,690 L1300,690" stroke="#7fb7c4" stroke-width="2" opacity=".5" stroke-dasharray="18 10"/>
+    <path d="M1070,724 L1290,724" stroke="#000" stroke-width="3" opacity=".5"/>
+    ${glyphRow(1086, 712, 8, 18, 27, '#a9e9f6', .55)}
+    <circle cx="1180" cy="708" r="17" fill="#0f1c20" stroke="#8fd3e3" stroke-width="2" opacity=".9"/>
+  </g>`;
+
+  // Ancient Nord sword planted before the chest: notched, bent tip, horned guard.
+  s += `<g transform="translate(990,400) rotate(173)" filter="url(#softGlow)">
+    <path d="M-11,-12 L-14,-300 L-4,-318 L-10,-336 L4,-372 L10,-336 L14,-300 L11,-12 Z" fill="url(#blade)" stroke="#0c1518" stroke-width="3"/>
+    <path d="M-3,-20 L-3,-320" stroke="#e8fbff" stroke-width="2" opacity=".55"/>
+    <path d="M-52,-6 C-40,-24 -20,-14 0,-14 C20,-14 40,-24 52,-6 C34,-6 18,2 0,2 C-18,2 -34,-6 -52,-6 Z" fill="#2a2420" stroke="#0c0a09" stroke-width="3"/>
+    <rect x="-7" y="2" width="14" height="66" rx="4" fill="#3a2a20" stroke="#0c0a09" stroke-width="3"/>
+    <circle cx="0" cy="74" r="11" fill="#2a2420" stroke="#0c0a09" stroke-width="3"/>
+  </g>`;
+  // Horned helmet resting on the lid.
+  s += `<g transform="translate(1268,532)">
+    <path d="M-44,0 C-44,-46 44,-46 44,0 Z" fill="url(#helm)" stroke="#0a1114" stroke-width="3"/>
+    <path d="M-40,-14 C-70,-24 -78,-56 -66,-80 C-62,-52 -48,-38 -30,-30 Z" fill="#cdbb9a" stroke="#2a2218" stroke-width="2"/>
+    <path d="M40,-14 C70,-24 78,-56 66,-80 C62,-52 48,-38 30,-30 Z" fill="#cdbb9a" stroke="#2a2218" stroke-width="2"/>
+    <path d="M-44,0 L44,0" stroke="#7fb7c4" stroke-width="2" opacity=".5"/>
+  </g>`;
+
+  // Gold glints spilling from the chest.
+  s += particles(26, 1060, 1300, 600, 650, 2, 5, '#ffd68a', .9);
+  return s;
+}
+
+function defs() {
+  return `<defs>
+    <radialGradient id="sky" cx="62%" cy="58%" r="75%">
+      <stop offset="0" stop-color="#16303a"/><stop offset=".45" stop-color="#0a161b"/><stop offset="1" stop-color="#020405"/>
+    </radialGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c3a3f"/><stop offset="1" stop-color="#151d20"/></linearGradient>
+    <linearGradient id="stoneDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f3e44"/><stop offset="1" stop-color="#11181b"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff9a4a"/><stop offset=".5" stop-color="#bfefff"/><stop offset="1" stop-color="#ff9a4a"/></linearGradient>
+    <radialGradient id="void" cx="50%" cy="80%" r="70%">
+      <stop offset="0" stop-color="#3f7f8f"/><stop offset=".35" stop-color="#0f2a33"/><stop offset="1" stop-color="#03080a"/>
+    </radialGradient>
+    <linearGradient id="ray" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#e6fbff" stop-opacity=".75"/><stop offset=".5" stop-color="#8fd9ea" stop-opacity=".18"/><stop offset="1" stop-color="#8fd9ea" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16232a"/><stop offset="1" stop-color="#030607"/></linearGradient>
+    <radialGradient id="pool"><stop offset="0" stop-color="#bff3ff" stop-opacity=".45"/><stop offset="1" stop-color="#bff3ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fireGlow"><stop offset="0" stop-color="#ffb35c" stop-opacity=".55"/><stop offset=".4" stop-color="#ff7a2a" stop-opacity=".18"/><stop offset="1" stop-color="#ff7a2a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a1a"/><stop offset=".6" stop-color="#ffa53d"/><stop offset="1" stop-color="#ffd27a" stop-opacity=".2"/></linearGradient>
+    <linearGradient id="chest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4d54"/><stop offset="1" stop-color="#141d21"/></linearGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e7479"/><stop offset=".5" stop-color="#c6e3ea"/><stop offset="1" stop-color="#4c5f64"/></linearGradient>
+    <linearGradient id="helm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d7f84"/><stop offset="1" stop-color="#2a3539"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff1c9"/><stop offset=".45" stop-color="#e6b65c"/><stop offset=".55" stop-color="#b9822e"/><stop offset="1" stop-color="#f3d38a"/>
+    </linearGradient>
+    <radialGradient id="wallFade" cx="1180" cy="700" r="620" gradientUnits="userSpaceOnUse"><stop offset=".25" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+    <mask id="wallMask" maskUnits="userSpaceOnUse" x="0" y="0" width="2400" height="1200"><rect x="0" y="0" width="2400" height="1200" fill="url(#wallFade)"/></mask>
+    <radialGradient id="vignette" cx="50%" cy="50%" r="72%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></radialGradient>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="4" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0" result="grain"/>
+      <feComposite in="grain" in2="SourceGraphic" operator="in" result="g2"/>
+      <feBlend in="SourceGraphic" in2="g2" mode="multiply"/>
+    </filter>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigGlow" x="-100%" y="-300%" width="300%" height="700%"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="mist" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>
+    <filter id="textGlow" x="-10%" y="-40%" width="120%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14" result="b"/>
+      <feFlood flood-color="#8fd9ea" flood-opacity=".35"/><feComposite in2="b" operator="in" result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="9"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .05 0"/>
+    </filter>
+  </defs>`;
+}
+
+function title(x, y, size, align) {
+  const anchor = align === 'center' ? 'middle' : 'start';
+  return `<g filter="url(#textGlow)">
+    <text x="${x}" y="${y}" font-family="Cinzel" font-weight="900" font-size="${size}" letter-spacing="${size * .06}" text-anchor="${anchor}" fill="url(#gold)" stroke="#2a1a08" stroke-width="${size / 60}" paint-order="stroke">TombLoot</text>
+  </g>`;
+}
+
+function render() {
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${defs()}`;
+  s += `<rect width="${W}" height="${H}" fill="url(#sky)"/>`;
+
+  if (layout === 'key') {
+    s += `<rect x="0" y="770" width="${W}" height="${H - 770}" fill="url(#floor)"/>`;
+    s += `<g transform="translate(290,0)">${barrow()}</g>`;
+    s += `<g filter="url(#mist)" opacity=".55"><ellipse cx="1100" cy="860" rx="800" ry="70" fill="#5c8a94"/><ellipse cx="1700" cy="900" rx="600" ry="60" fill="#4b7882"/></g>`;
+    s += particles(160, 1000, 1900, 100, 760, .8, 2.4, '#cff6ff', .7);
+    s += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
+    // Left: title, tagline, badges.
+    s += title(118, 470, 150, 'start');
+    s += `<line x1="126" y1="512" x2="800" y2="512" stroke="url(#gold)" stroke-width="2" opacity=".7"/>`;
+    s += `<text x="126" y="582" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="60" fill="#d9eef2">Ancient tombs. Ancient loot.</text>`;
+    s += `<text x="128" y="640" font-family="Cinzel" font-weight="500" font-size="22" letter-spacing="4" fill="#8fc7d3">NO MORE IRON SWORDS IN ANCIENT BARROWS</text>`;
+    const badges = ['SKSE PLUGIN', 'NO ESP', 'PATCH-PROOF'];
+    let bx = 128;
+    for (const b of badges) {
+      const w = b.length * 16 + 52;
+      s += `<g><rect x="${bx}" y="700" width="${w}" height="52" rx="26" fill="#0b1a1f" stroke="#e0b866" stroke-opacity=".55" stroke-width="2"/>
+        <text x="${bx + w / 2}" y="734" text-anchor="middle" font-family="Cinzel" font-weight="700" font-size="20" letter-spacing="3" fill="#f0d79a">${b}</text></g>`;
+      bx += w + 18;
+    }
+  } else {
+    // Banner: the barrow scaled down on the right, the title on the left.
+    s += `<rect x="0" y="400" width="${W}" height="${H - 400}" fill="url(#floor)"/>`;
+    s += `<g transform="translate(751,-24) scale(.55)">${barrow()}</g>`;
+    s += `<g filter="url(#mist)" opacity=".5"><ellipse cx="1400" cy="430" rx="700" ry="35" fill="#5c8a94"/></g>`;
+    s += particles(90, 1150, 1900, 20, 400, .8, 2.2, '#cff6ff', .7);
+    s += `<rect width="${W}" height="${H}" fill="url(#vignette)"/>`;
+    s += title(130, 250, 150, 'start');
+    s += `<line x1="138" y1="285" x2="690" y2="285" stroke="url(#gold)" stroke-width="2" opacity=".7"/>`;
+    s += `<text x="138" y="350" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="52" fill="#d9eef2">Ancient tombs. Ancient loot.</text>`;
+  }
+  s += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity="1"/>`;
+  s += `</svg>`;
+  document.getElementById('out').innerHTML = s;
+}
+
+Promise.all([
+  document.fonts.load('900 100px Cinzel'),
+  document.fonts.load('500 20px Cinzel'),
+  document.fonts.load('700 20px Cinzel'),
+  document.fonts.load('italic 600 50px "Cormorant Garamond"'),
+]).then(render, render);
+</script>
+</body>
+</html>

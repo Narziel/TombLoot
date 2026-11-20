@@ -4,3 +4,6 @@
 /vcpkg_installed/
 .vs/
 *.user
+
+# Fonts for the Nexus images, downloaded by art/render.ps1
+/art/fonts/
