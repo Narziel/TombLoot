@@ -73,15 +73,35 @@ Config Config::Load()
 				if (auto fb = value.find("fallback"); fb != value.end() && fb->is_string()) {
 					list.fallback = fb->get<std::string>();
 				}
+				if (auto ex = value.find("extends"); ex != value.end() && ex->is_string()) {
+					list.extends = ex->get<std::string>();
+				}
 				cfg.created.emplace(name, std::move(list));
+			}
+			// "extends": the parent's pieces (as read from the file) come first; one level only.
+			for (auto& [name, list] : cfg.created) {
+				if (list.extends.empty()) {
+					continue;
+				}
+				auto parent = cfg.created.find(list.extends);
+				if (parent == cfg.created.end() || parent->first == name || !parent->second.extends.empty()) {
+					logger::warn("[Config] @{} extends @{}: unknown, itself, or a list that extends another; ignored", name, list.extends);
+					continue;
+				}
+				list.items.insert(list.items.begin(), parent->second.items.begin(), parent->second.items.end());
+				if (list.fallback.empty()) {
+					list.fallback = parent->second.fallback;
+				}
 			}
 		}
 		cfg.nordic = ReadFamily(json, "nordic");
+		cfg.solstheim = ReadFamily(json, "solstheim");
 	} catch (const std::exception& e) {
 		logger::error("[Config] {} is invalid ({}): nothing will be replaced", kFile.string(), e.what());
 		return Config{};
 	}
-	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists, nordic {} lists / {} replacements", cfg.survey,
-		cfg.ancientPlugins.size(), cfg.created.size(), cfg.nordic.lists.size(), cfg.nordic.replace.size());
+	logger::info("[Config] read: survey {}, {} ancient plugins, {} created lists, nordic {} lists / {} replacements, solstheim {} lists / {} replacements",
+		cfg.survey, cfg.ancientPlugins.size(), cfg.created.size(), cfg.nordic.lists.size(), cfg.nordic.replace.size(), cfg.solstheim.lists.size(),
+		cfg.solstheim.replace.size());
 	return cfg;
 }

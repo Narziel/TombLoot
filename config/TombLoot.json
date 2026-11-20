@@ -39,6 +39,27 @@
 			"AncientNordArmo(u)ryEXTREMESE.esp|0x00082D",    // ArmorDraugrBootsLight
 			{ "form": "Skyrim.esm|0x013960", "level": 38 }   // EbonyBoots
 		] },
+		// Solstheim : les mêmes pièces, plus le stalhrim au palier de l'ébène. Le stalhrim, glace de
+		// Solstheim travaillée par les anciens Nordiques, n'a sa place que dans les cryptes de l'île.
+		"solstheim_cuirass": { "extends": "ancient_cuirass", "items": [
+			{ "form": "Dragonborn.esm|0x01CD9F", "level": 38 }, // DLC2ArmorStalhrimHeavyCuirass
+			{ "form": "Dragonborn.esm|0x01CDA2", "level": 38 }  // DLC2ArmorStalhrimLightCuirass
+		] },
+		"solstheim_helmet": { "extends": "ancient_helmet", "items": [
+			{ "form": "Dragonborn.esm|0x01CDA1", "level": 38 }, // DLC2ArmorStalhrimHeavyHelmet
+			{ "form": "Dragonborn.esm|0x01CDA3", "level": 38 }  // DLC2ArmorStalhrimLightHelmet
+		] },
+		"solstheim_gauntlets": { "extends": "ancient_gauntlets", "items": [
+			{ "form": "Dragonborn.esm|0x01CDA0", "level": 38 }, // DLC2ArmorStalhrimHeavyGauntlets
+			{ "form": "Dragonborn.esm|0x01CDA5", "level": 38 }  // DLC2ArmorStalhrimLightGauntlets
+		] },
+		"solstheim_boots": { "extends": "ancient_boots", "items": [
+			{ "form": "Dragonborn.esm|0x01CD9E", "level": 38 }, // DLC2ArmorStalhrimHeavyBoots
+			{ "form": "Dragonborn.esm|0x01CD7E", "level": 38 }  // DLC2ArmorStalhrimLightBoots
+		] },
+		"solstheim_shield": { "extends": "ancient_shield", "items": [
+			{ "form": "Dragonborn.esm|0x026237", "level": 38 }  // DLC2ArmorStalhrimShield
+		] },
 		"ancient_shield": {
 			"items": [
 				"AncientNordArmo(u)ryEXTREMESE.esp|0x000835", // ArmorDraugrShield
@@ -67,10 +88,7 @@
 			"Skyrim.esm|0x0C2963",     // LootDraugrArmor10
 			"Skyrim.esm|0x06883B",     // LootDraugrArmor25
 			"Skyrim.esm|0x088514",     // LootDraugrArmor50
-			"Skyrim.esm|0x0B4202",     // LootDraugrArmor100
-			"Dragonborn.esm|0x02C442", // DLC2LootDraugrArmor25
-			"Dragonborn.esm|0x02C443", // DLC2LootDraugrArmor50
-			"Dragonborn.esm|0x02C445"  // DLC2LootDraugrArmor100
+			"Skyrim.esm|0x0B4202"      // LootDraugrArmor100
 		],
 
 		// Liste générique -> liste d'époque. Seul l'objet de l'entrée change : niveau et nombre restent.
@@ -115,44 +133,99 @@
 					"Dragonborn.esm|0x02BC16"  // DLC2LItemArrowsAll
 				]
 			},
+			// Armures. Les listes "draugr et nordique" d'Ancient Nord Armoury mêlent ses pièces anciennes
+			// (déjà dans nos listes) au fer renforcé et au nordique gravé : elles sont remplacées aussi,
+			// dans les cryptes seulement (le mod lui-même n'est pas modifié).
 			{
 				"to": "@ancient_cuirass",
 				"from": [
-					"Skyrim.esm|0x016739",     // LItemArmorCuirassAny
-					"Dragonborn.esm|0x02BC1B", // DLC2LItemArmorCuirassHeavy
-					"Dragonborn.esm|0x02BC1C"  // DLC2LItemArmorCuirassLight
+					"Skyrim.esm|0x016739",                         // LItemArmorCuirassAny
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A5"   // LItemDraugrandNordicCuirass
 				]
 			},
 			{
 				"to": "@ancient_helmet",
 				"from": [
-					"Skyrim.esm|0x016743",     // LItemArmorHelmetAny
-					"Dragonborn.esm|0x02BC1F", // DLC2LItemArmorHelmetHeavy
-					"Dragonborn.esm|0x02BC20"  // DLC2LItemArmorHelmetLight
+					"Skyrim.esm|0x016743",                         // LItemArmorHelmetAny
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A4"   // LItemDraugrandNordicHelmet
 				]
 			},
 			{
 				"to": "@ancient_gauntlets",
 				"from": [
-					"Skyrim.esm|0x016742",     // LItemArmorGauntletsAny
-					"Dragonborn.esm|0x02BC1D", // DLC2LItemArmorGauntletsHeavy
-					"Dragonborn.esm|0x02BC1E"  // DLC2LItemArmorGauntletsLight
+					"Skyrim.esm|0x016742",                         // LItemArmorGauntletsAny
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A6"   // LItemDraugrandNordicGauntlets
 				]
 			},
 			{
 				"to": "@ancient_boots",
 				"from": [
-					"Skyrim.esm|0x01673C",     // LItemArmorBootsAny
-					"Dragonborn.esm|0x02BC19", // DLC2LItemArmorBootsHeavy
-					"Dragonborn.esm|0x02BC1A"  // DLC2LItemArmorBootsLight
+					"Skyrim.esm|0x01673C",                         // LItemArmorBootsAny
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A7"   // LItemDraugrandNordicBoots
 				]
 			},
 			{
 				"to": "@ancient_shield",
 				"from": [
-					"Skyrim.esm|0x0165E6",     // LItemArmorShieldAny
-					"Dragonborn.esm|0x02BC21", // DLC2LItemArmorShieldHeavy
-					"Dragonborn.esm|0x02BC22"  // DLC2LItemArmorShieldLight
+					"Skyrim.esm|0x0165E6",                         // LItemArmorShieldAny
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099D"   // LItemDraugrandNordicShield
+				]
+			}
+		]
+	},
+
+	"solstheim": {
+		// Listes d'armure des cryptes de Solstheim (Dragonborn) : mêmes remplacements, vers les listes
+		// "solstheim_*" qui ajoutent le stalhrim.
+		"lists": [
+			"Dragonborn.esm|0x02C442", // DLC2LootDraugrArmor25
+			"Dragonborn.esm|0x02C443", // DLC2LootDraugrArmor50
+			"Dragonborn.esm|0x02C445"  // DLC2LootDraugrArmor100
+		],
+		"replace": [
+			{
+				"to": "@solstheim_cuirass",
+				"from": [
+					"Skyrim.esm|0x016739",                         // LItemArmorCuirassAny
+					"Dragonborn.esm|0x02BC1B",                     // DLC2LItemArmorCuirassHeavy
+					"Dragonborn.esm|0x02BC1C",                     // DLC2LItemArmorCuirassLight
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A5"   // LItemDraugrandNordicCuirass
+				]
+			},
+			{
+				"to": "@solstheim_helmet",
+				"from": [
+					"Skyrim.esm|0x016743",                         // LItemArmorHelmetAny
+					"Dragonborn.esm|0x02BC1F",                     // DLC2LItemArmorHelmetHeavy
+					"Dragonborn.esm|0x02BC20",                     // DLC2LItemArmorHelmetLight
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A4"   // LItemDraugrandNordicHelmet
+				]
+			},
+			{
+				"to": "@solstheim_gauntlets",
+				"from": [
+					"Skyrim.esm|0x016742",                         // LItemArmorGauntletsAny
+					"Dragonborn.esm|0x02BC1D",                     // DLC2LItemArmorGauntletsHeavy
+					"Dragonborn.esm|0x02BC1E",                     // DLC2LItemArmorGauntletsLight
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A6"   // LItemDraugrandNordicGauntlets
+				]
+			},
+			{
+				"to": "@solstheim_boots",
+				"from": [
+					"Skyrim.esm|0x01673C",                         // LItemArmorBootsAny
+					"Dragonborn.esm|0x02BC19",                     // DLC2LItemArmorBootsHeavy
+					"Dragonborn.esm|0x02BC1A",                     // DLC2LItemArmorBootsLight
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x0009A7"   // LItemDraugrandNordicBoots
+				]
+			},
+			{
+				"to": "@solstheim_shield",
+				"from": [
+					"Skyrim.esm|0x0165E6",                         // LItemArmorShieldAny
+					"Dragonborn.esm|0x02BC21",                     // DLC2LItemArmorShieldHeavy
+					"Dragonborn.esm|0x02BC22",                     // DLC2LItemArmorShieldLight
+					"AncientNordArmo(u)ryEXTREMESE.esp|0x00099D"   // LItemDraugrandNordicShield
 				]
 			}
 		]

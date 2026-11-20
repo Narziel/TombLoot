@@ -29,12 +29,14 @@ struct Config
 		};
 		std::vector<Item> items;
 		std::string       fallback;
+		std::string       extends;  // name of another created list whose pieces come first
 	};
 
 	bool                               survey{ true };
 	std::vector<std::string>           ancientPlugins;
 	std::map<std::string, CreatedList> created;
-	Family                             nordic;
+	Family                             nordic;     // crypts of Skyrim
+	Family                             solstheim;  // crypts of Solstheim (Dragonborn lists)
 
 	// Reads the file; on a missing or invalid file, keeps the defaults (nothing replaced) and says so.
 	static Config Load();

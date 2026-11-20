@@ -153,5 +153,6 @@ namespace Swap
 		Restore();
 		BuildCreated(a_config);
 		ApplyFamily("nordic", a_config.nordic);
+		ApplyFamily("solstheim", a_config.solstheim);
 	}
 }
