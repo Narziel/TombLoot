@@ -35,11 +35,13 @@ struct Config
 			std::uint16_t            level{ 1 };
 			std::vector<std::string> onlyIf;  // kept only if one of these plugins is loaded
 			std::vector<std::string> unless;  // skipped if one of these plugins is loaded
+			std::uint16_t            count{ 1 };
 		};
 		std::vector<Item> items;
 		std::string       fallback;
 		std::string       extends;  // name of another created list whose pieces come first
 		std::int8_t       chanceNone{ 0 };  // percent; keeps the chance of a list it replaces (10 % special loot)
+		bool              highest{ false };  // one piece among those of the highest level reached (Bethesda's boss gold), not among all
 	};
 
 	enum class Survey

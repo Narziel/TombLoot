@@ -77,8 +77,9 @@ Config Config::Load()
 							list.items.push_back({ item.get<std::string>(), 1 });
 						} else if (item.is_object() && item.contains("form") && item["form"].is_string()) {
 							const auto level = item.value("level", 1);
+							const auto count = item.value("count", 1);
 							list.items.push_back({ item["form"].get<std::string>(), static_cast<std::uint16_t>(std::clamp(level, 1, 255)),
-								Strings(item, "only_if"), Strings(item, "unless") });
+								Strings(item, "only_if"), Strings(item, "unless"), static_cast<std::uint16_t>(std::clamp(count, 1, 1000)) });
 						}
 					}
 				}
@@ -86,6 +87,7 @@ Config Config::Load()
 					list.fallback = fb->get<std::string>();
 				}
 				list.chanceNone = static_cast<std::int8_t>(std::clamp(value.value("chance_none", 0), 0, 100));
+				list.highest = value.value("pick", "all"s) == "highest";
 				if (auto ex = value.find("extends"); ex != value.end() && ex->is_string()) {
 					list.extends = ex->get<std::string>();
 				}

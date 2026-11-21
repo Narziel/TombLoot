@@ -70,7 +70,7 @@ namespace Swap
 		}
 
 		void Fill(const std::string& a_name, RE::TESLevItem* a_list, std::vector<RE::LEVELED_OBJECT>& a_entries, std::int8_t a_chanceNone,
-			std::uint32_t a_missing)
+			bool a_highest, std::uint32_t a_missing)
 		{
 			std::ranges::stable_sort(a_entries, {}, &RE::LEVELED_OBJECT::level);  // the engine reads entries by rising level
 			if (a_entries.size() > 255) {
@@ -82,12 +82,13 @@ namespace Swap
 			}
 			a_list->numEntries = static_cast<std::uint8_t>(a_entries.size());
 			a_list->chanceNone = a_chanceNone;
-			a_list->llFlags = RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel;
+			// "Highest": one piece among those of the highest level reached, as Bethesda's boss gold.
+			a_list->llFlags = a_highest ? RE::TESLeveledList::kCalculateForEachItemInCount : RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel;
 			a_list->chanceGlobal = nullptr;
 
 			std::string text;
 			for (const auto& e : a_entries) {
-				text += std::format("{}{} (lvl {})", text.empty() ? "" : " ; ", Forms::Named(e.form), e.level);
+				text += std::format("{}{}{} (lvl {})", text.empty() ? "" : " ; ", Forms::Named(e.form), e.count > 1 ? std::format(" x{}", e.count) : ""s, e.level);
 			}
 			logger::info("[Created] @{} 0x{:08X}: {} pieces, {} skipped: {}", a_name, a_list->GetFormID(), a_entries.size(), a_missing, text);
 		}
@@ -110,11 +111,13 @@ namespace Swap
 					const bool wanted = (item.onlyIf.empty() || std::ranges::any_of(item.onlyIf, Loaded)) &&
 					                    std::ranges::none_of(item.unless, Loaded);
 					auto* form = wanted ? Forms::Resolve(item.form) : nullptr;
-					if (!form || !(form->Is(RE::FormType::Armor) || form->Is(RE::FormType::Weapon) || form->Is(RE::FormType::LeveledItem))) {
+					// Gear, leveled lists, and treasure (ingots, ore, gems are misc items).
+					if (!form || !(form->Is(RE::FormType::Armor) || form->Is(RE::FormType::Weapon) || form->Is(RE::FormType::LeveledItem) ||
+									  form->Is(RE::FormType::Misc))) {
 						++p.missing;
 						continue;
 					}
-					p.entries.push_back({ form, 1, item.level, 0, nullptr });
+					p.entries.push_back({ form, item.count, item.level, 0, nullptr });
 				}
 				if (p.entries.empty()) {
 					continue;
@@ -146,7 +149,7 @@ namespace Swap
 				if (fallback && fallback != it->second && std::ranges::none_of(p.entries, [](const auto& e) { return e.level <= 1; })) {
 					p.entries.push_back({ fallback, 1, 1, 0, nullptr });
 				}
-				Fill(name, it->second, p.entries, spec.chanceNone, p.missing);
+				Fill(name, it->second, p.entries, spec.chanceNone, spec.highest, p.missing);
 			}
 		}
 

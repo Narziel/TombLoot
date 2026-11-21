@@ -172,7 +172,52 @@
 			],
 			// No ancient shield without these mods: an Ancient Nord helmet instead of an iron shield.
 			"fallback": "@ancient_helmet"
-		}
+		},
+
+		// Treasure instead of septims. The Septim coin dates from the Second Era; the dead of the
+		// barrows and the Dwemer were gone long before. Their gold becomes bullion, ore and gems of the
+		// same average value, at the same levels: worth as much, but it must be sold (or worked).
+		// To keep septims in tombs, remove the "gold" replacements of each family below.
+		// Values: silver ingot 50, gold ore 50, gold ingot 100, garnet 100, flawless garnet 150,
+		// amethyst 120, ruby 200, Dwarven metal ingot 30, Dwarven scrap metal 15, silver ore 25, cog 5.
+		// Boss chest gold (50, 100, 150, 200, 250 coins at levels 1, 6, 11, 16, 21; one amount, the
+		// highest reached): two treasures of that value at each level.
+		"ancient_treasure": { "pick": "highest", "items": [
+			{ "form": "Skyrim.esm|0x05ACE3", "level": 1 },              // silver ingot (50)
+			{ "form": "Skyrim.esm|0x05ACDE", "level": 1 },              // gold ore (50)
+			{ "form": "Skyrim.esm|0x05AD9E", "level": 6 },              // gold ingot (100)
+			{ "form": "Skyrim.esm|0x063B45", "level": 6 },              // garnet (100)
+			{ "form": "Skyrim.esm|0x05ACE3", "level": 11, "count": 3 }, // silver ingots (150)
+			{ "form": "Skyrim.esm|0x068521", "level": 11 },             // flawless garnet (150)
+			{ "form": "Skyrim.esm|0x063B42", "level": 16 },             // ruby (200)
+			{ "form": "Skyrim.esm|0x05AD9E", "level": 16, "count": 2 }, // gold ingots (200)
+			{ "form": "Skyrim.esm|0x05ACE3", "level": 21, "count": 5 }, // silver ingots (250)
+			{ "form": "Skyrim.esm|0x063B46", "level": 21, "count": 2 }  // amethysts (240)
+		] },
+		// Solstheim: the same, and a piece of stalhrim at the highest level.
+		"solstheim_treasure": { "extends": "ancient_treasure", "pick": "highest", "items": [
+			{ "form": "Dragonborn.esm|0x02B06B", "level": 21 }          // stalhrim (200)
+		] },
+		// The 20 coins of an ordinary barrow chest, coin by coin: 1 in 25 is a nugget of silver ore
+		// (worth 25), so 20 coins give about 20 in value.
+		"ancient_coin": { "chance_none": 96, "items": [ "Skyrim.esm|0x05ACDF" ] },  // silver ore
+		// Loose change (1 to 9 coins) in barrow chests and alcove corpses, and on the draugr.
+		"ancient_change": { "chance_none": 85, "items": [ "Skyrim.esm|0x05ACDF" ] },
+		"ancient_change25": { "chance_none": 96, "items": [ "Skyrim.esm|0x05ACDF" ] },
+		// Dwemer boss chest gold (50 to 250 coins at levels 1 to 21, one among all those reached).
+		"dwemer_treasure": { "items": [
+			{ "form": "Skyrim.esm|0x0DB8A2", "level": 1, "count": 2 },  // Dwarven metal ingots (60)
+			{ "form": "Skyrim.esm|0x0C886A", "level": 1, "count": 3 },  // Dwarven scrap metal (45)
+			{ "form": "Skyrim.esm|0x0DB8A2", "level": 6, "count": 3 },  // (90)
+			{ "form": "Skyrim.esm|0x063B45", "level": 6 },              // garnet (100)
+			{ "form": "Skyrim.esm|0x0DB8A2", "level": 11, "count": 5 }, // (150)
+			{ "form": "Skyrim.esm|0x068521", "level": 11 },             // flawless garnet (150)
+			{ "form": "Skyrim.esm|0x0DB8A2", "level": 16, "count": 7 }, // (210)
+			{ "form": "Skyrim.esm|0x063B42", "level": 16 },             // ruby (200)
+			{ "form": "Skyrim.esm|0x0DB8A2", "level": 21, "count": 8 }, // (240)
+			{ "form": "Skyrim.esm|0x063B46", "level": 21, "count": 2 }  // amethysts (240)
+		] },
+		"dwemer_change": { "chance_none": 30, "items": [ "Skyrim.esm|0x0AEBF1" ] }  // Dwemer cog
 	},
 
 	"nordic": {
@@ -193,14 +238,19 @@
 			"Skyrim.esm|0x01ED1B",     // LootDraugrEnchWeapons100
 			"Skyrim.esm|0x0B5561",     // LootDraugrEnchArmor15
 			"Skyrim.esm|0x0B5562",     // LootDraugrEnchArmor25
-			"Skyrim.esm|0x034902"      // LootDraugrEnchArmor100
+			"Skyrim.esm|0x034902",     // LootDraugrEnchArmor100
+			"Skyrim.esm|0x04F78C",     // DeathItemDraugrGold (coins on the draugr)
+			"Skyrim.esm|0x03AD7E"      // DeathItemDragonPriest (gold of the dragon priests)
 		],
 
 		// Chests whose own entries are replaced: their special loot is a list shared with 35 chests
 		// (Dwemer and Falmer bosses…), which stays intact. Every chest holding one of "lists" is added.
 		"containers": [
 			"Skyrim.esm|0x020671",     // TreasDraugrChestBoss
-			"Skyrim.esm|0x020670"      // TreasDraugrChest (10 % special loot in the base game)
+			"Skyrim.esm|0x020670",     // TreasDraugrChest (10 % special loot in the base game)
+			// Corpses in the barrow alcoves (their loose change).
+			"Skyrim.esm|0x023969", "Skyrim.esm|0x08008F", "Skyrim.esm|0x080090", "Skyrim.esm|0x080091", "Skyrim.esm|0x080092",
+			"Skyrim.esm|0x080093", "Skyrim.esm|0x080094", "Skyrim.esm|0x08008D", "Skyrim.esm|0x08008E", "Skyrim.esm|0x0DB047"
 		],
 
 		// Weapons with one of these material keywords that a mod put in the generic lists (Reforging
@@ -210,6 +260,17 @@
 
 		// Generic list -> era list. Only the entry's object changes: level and count stay.
 		"replace": [
+			// Gold: treasure of the same value instead of septims (see "ancient_treasure").
+			{
+				"to": "@ancient_treasure",
+				"from": [
+					"Skyrim.esm|0x088513",     // LootDraugrGoldBoss01
+					"Skyrim.esm|0x088512"      // LootDraugrGold
+				]
+			},
+			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ] },      // Gold001, coins put straight in a chest
+			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ] },    // LootGoldChange
+			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ] },  // LootGoldChange25
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
 				"from": [
@@ -383,6 +444,11 @@
 		],
 		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
 		"replace": [
+			// Gold: treasure of the same value, with stalhrim (see "ancient_treasure").
+			{ "to": "@solstheim_treasure", "from": [ "Skyrim.esm|0x088513", "Skyrim.esm|0x088512" ] },  // LootDraugrGoldBoss01, LootDraugrGold
+			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ] },      // Gold001
+			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ] },    // LootGoldChange
+			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ] },  // LootGoldChange25
 			{
 				"to": "@solstheim_special",
 				"from": [
@@ -512,10 +578,16 @@
 		"containers": [
 			"Skyrim.esm|0x020652",     // TreasDwarvenChestBoss
 			"Skyrim.esm|0x02069A",     // TreasDwarvenChestLarge
-			"Skyrim.esm|0x020650"      // TreasDwarvenChestSmall
+			"Skyrim.esm|0x020650",     // TreasDwarvenChestSmall
+			"Dragonborn.esm|0x02AABA", // DLC2TreasDwarvenChestBoss
+			"Dragonborn.esm|0x02AABB", // DLC2TreasDwarvenChestLarge
+			"Dragonborn.esm|0x02AABC"  // DLC2TreasDwarvenChestSmall
 		],
 		"era_keywords": [ "WeapMaterialDwarven" ],
 		"replace": [
+			// Gold: Dwarven metal and gems of the same value (see "ancient_treasure").
+			{ "to": "@dwemer_treasure", "from": [ "Skyrim.esm|0x101DAA" ] },   // LootDwarvenGoldBoss
+			{ "to": "@dwemer_change", "from": [ "Skyrim.esm|0x037C2B" ] },     // LootGoldChange
 			{
 				"to": "Skyrim.esm|0x070C21", // LItemDwarvenOnlyWeapons
 				"from": [
