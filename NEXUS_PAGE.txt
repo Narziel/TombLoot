@@ -52,7 +52,8 @@ In Skyrim, a barrow sealed for three thousand years draws its treasure from the 
 [list]
 [*][color=#bfe3ea][b]Nordic barrows[/b][/color] — Ancient Nord blades and honed steel, Ancient Nord armor, draugr arrows, and the frost-enchanted weapons of the draugr lords. The great boss chests hold the finest pieces of the age.
 [*][color=#bfe3ea][b]The barrows of Solstheim[/b][/color] — The same ancient gear, and at high level, [b]stalhrim[/b]: the enchanted ice that only the ancient Nords of Solstheim knew how to work. You will find it there, and nowhere else.
-[*][color=#bfe3ea][b]Dwemer ruins[/b][/color] — Dwarven weapons, Dwarven armor, enchanted Dwarven gear. The Deep Folk did not forge steel shields.
+[*][color=#bfe3ea][b]Dwemer ruins[/b][/color] — Dwarven weapons, Dwarven armor, enchanted Dwarven gear, in Skyrim and on Solstheim. The Deep Folk did not forge steel shields.
+[*][color=#bfe3ea][b]Treasure, not septims[/b][/color] — The Septim coin was struck in the Second Era, long after these tombs were sealed. Their gold becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the [b]same value[/b], at the same levels. Worth as much, but you have to sell it.
 [*][color=#bfe3ea][b]The highest levels[/b][/color] — Ebony comes at level 38, as Bethesda intended. With Open World Loot or MorrowLoot Ultimate, which ban random ebony, it stays out by itself.
 [/list]
 
@@ -82,7 +83,7 @@ TombLoot does not live in a plugin. It works [b]at launch, in memory, after ever
 [list]
 [*]Bandit camps, forts, merchants, NPC outfits: the living keep their gear.
 [*]Uniques, quest items and everything placed by hand, including the rewards that Bethesda and Open World Loot put in specific chests.
-[*]Gold, gems, potions, scrolls, jewelry.
+[*]Gems, ingots, potions, scrolls, jewelry, and the gold of perks (Golden Touch, Imperial Luck).
 [*]Falmer hives: the Falmer prey on today's travellers, so iron in their nests makes sense.
 [/list]
 
@@ -139,7 +140,7 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
 
-TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.1.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
+TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.2.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
 
 [center][i][color=#9fb8bd]May the dead keep their own.[/color][/i][/center]
 
@@ -225,6 +226,11 @@ TombLoot is released under the GNU General Public License v3 or later. You may u
 ---------------------------------------------------------------------
 ONGLET « Logs » (changelog, une ligne par point)
 ---------------------------------------------------------------------
+1.2.0
+- Treasure instead of septims: the gold of barrows (boss chests, dragon priests, draugr, chest coins and loose change) and Dwemer ruins becomes ingots, ore and gems of the same value, at the same levels.
+- Barrow chests now give draugr arrows (two arrow lists were missed since 1.0).
+- Solstheim's Dwemer ruins are covered (Dragonborn lists).
+
 1.1.0
 - Ancient Nord and Dwarven weapons that weapon mods put in the common lists (Reforging) now stay in tombs.
 - Addresses checked against SE 1.5.97 and the 2026 update (1.7.x).

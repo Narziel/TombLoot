@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+- Treasure instead of septims: the gold of Nordic barrows (boss chests, dragon priests, draugr, the 20 coins of ordinary chests, loose change in chests and alcove corpses) and of Dwemer ruins becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the same average value, at the same levels. Solstheim's boss chests can give stalhrim. To keep septims, remove the gold replacements in the config.
+- Barrow chests draw their arrows from `LootDraugrArrows15` / `LootDraugrArrows100`, missed since 1.0: they now give draugr arrows instead of iron and steel ones.
+- Solstheim's Dwemer ruins (Dragonborn's `DLC2LootDwarven*` lists) are covered by the Dwemer family.
+- Created lists accept treasure (misc items), a count per piece, and `"pick": "highest"` (one piece among the highest level reached, like Bethesda's boss gold).
+
 ## 1.1.0
 
 - Ancient Nord and Dwarven weapons that a mod puts in the generic lists (Reforging - To the Masses does) now stay in tombs: weapons with an era material keyword found in the replaced lists are added to the era list (a copy made at launch; the era list carried by draugr is not changed). `"era_keywords"` in each family of the config; `[]` turns it off.
