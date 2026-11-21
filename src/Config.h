@@ -19,6 +19,10 @@ struct Config
 		bool                     autoChests{ true };    // also every chest that holds one of `lists` directly
 		bool                     autoSublists{ true };  // also mod sub-lists used only by tomb lists
 		std::vector<Replacement> replace;  // generic list -> era list
+		// Weapons carrying one of these material keywords (EditorID), found in the generic lists of a
+		// replacement, are added to its era list (a copy made at launch): a mod that puts its Ancient
+		// Nord weapons in LItemWeaponSword keeps them in tombs. Empty: off.
+		std::vector<std::string> eraKeywords;
 	};
 
 	// A leveled list made at launch (no vanilla list gives Ancient Nord armor), named "@name" in a

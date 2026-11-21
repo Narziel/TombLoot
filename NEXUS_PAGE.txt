@@ -69,6 +69,7 @@ TombLoot does not live in a plugin. It works [b]at launch, in memory, after ever
 [list]
 [*][b]It finds the tomb chests by itself[/b] — every chest that holds a tomb list, including unique boss chests and the barrows added by other mods.
 [*][b]It finds the mod sub-lists by itself[/b] — a sub-list that a weapon mod uses only in tombs is fixed too. A list also used by bandits, merchants or NPC outfits is never touched.
+[*][b]It keeps your mods' ancient weapons[/b] — a weapon mod that puts its Ancient Nord or Dwarven weapons in the common lists (Reforging does) still sees them in tombs: TombLoot recognizes them by their material and carries them over.
 [*][b]It never breaks on a missing mod[/b] — every form from a plugin you do not have is simply skipped.
 [*][b]It tells you what it did[/b] — a short report in the log says what tomb chests can give, and where any gear of the wrong age still comes from.
 [*][b]It costs nothing[/b] — about 10 milliseconds at launch. No script, no event, nothing in your save.
@@ -132,7 +133,8 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 
 [list]
 [*][b]Tested:[/b] Skyrim Anniversary Edition 1.6.1170 (Steam).
-[*]Built version-independent through Address Library: it should load on the other AE versions that Address Library covers. Not tested on SE 1.5.97. No VR.
+[*][b]Skyrim SE 1.5.97 and the 2026 update (1.7.x):[/b] built for them through Address Library, and every address the plugin uses is in their databases, but not tested in game yet. If you play one of them, please say in the comments whether it works: the log file says whether TombLoot loaded.
+[*]No VR.
 [/list]
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
@@ -223,6 +225,10 @@ TombLoot is released under the GNU General Public License v3 or later. You may u
 ---------------------------------------------------------------------
 ONGLET « Logs » (changelog, une ligne par point)
 ---------------------------------------------------------------------
+1.1.0
+- Ancient Nord and Dwarven weapons that weapon mods put in the common lists (Reforging) now stay in tombs.
+- Addresses checked against SE 1.5.97 and the 2026 update (1.7.x).
+
 1.0.0
 - Initial release.
 - Nordic barrows: Ancient Nord weapons, armor, arrows, enchanted gear and boss special loot.
@@ -243,6 +249,7 @@ Thank you for trying it. A few things that help me help you:
 [list]
 [*][b]Found gear of the wrong age in a tomb?[/b] Open [font=Courier New]Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log[/font] and paste the lines that start with [b][Summary][/b]. They name the chest and the list that brought the item, so I can fix it quickly.
 [*][b]A barrow mod that is not covered?[/b] Tell me which one: its lists can usually be added to the config in one line, and I will add them to the next version.
+[*][b]Playing Skyrim SE 1.5.97 or the 2026 update (1.7.x)?[/b] TombLoot is built for them but only tested on 1.6.1170. Please tell me whether it works for you, with your game version; if [font=Courier New]TombLoot.log[/font] exists and has [b][Summary][/b] lines, it loaded.
 [*][b]Installed mid-game?[/b] Tombs you already visited keep their loot until they reset. That is how Skyrim fills chests, not a bug.
 [/list]
 

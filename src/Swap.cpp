@@ -258,6 +258,136 @@ namespace Swap
 			return changed;
 		}
 
+		// The keywords of "era_keywords", by EditorID. An unknown one is noted and skipped.
+		std::vector<RE::BGSKeyword*> EraKeywords(const std::vector<std::string>& a_edids)
+		{
+			std::vector<RE::BGSKeyword*> out;
+			if (a_edids.empty()) {
+				return out;
+			}
+			auto* dh = RE::TESDataHandler::GetSingleton();
+			for (const auto& edid : a_edids) {
+				RE::BGSKeyword* found = nullptr;
+				for (auto* kw : dh->GetFormArray<RE::BGSKeyword>()) {
+					const char* name = kw ? kw->GetFormEditorID() : nullptr;
+					if (name && edid == name) {
+						found = kw;
+						break;
+					}
+				}
+				if (found) {
+					out.push_back(found);
+				} else {
+					logger::warn("[Era] keyword {} not found, skipped", edid);
+				}
+			}
+			return out;
+		}
+
+		bool IsEraWeapon(RE::TESForm* a_form, const std::vector<RE::BGSKeyword*>& a_keywords)
+		{
+			// Plain weapons only: enchanted lists keep their own pieces and odds.
+			auto* weap = a_form ? a_form->As<RE::TESObjectWEAP>() : nullptr;
+			return weap && !weap->formEnchanting && weap->GetPlayable() && std::ranges::any_of(a_keywords, [&](auto* kw) { return weap->HasKeyword(kw); });
+		}
+
+		// Every era weapon a list can give, with the lowest level it can come at.
+		void CollectEraWeapons(RE::TESForm* a_form, std::uint16_t a_level, const std::vector<RE::BGSKeyword*>& a_keywords,
+			std::unordered_set<RE::TESLevItem*>& a_visited, std::map<RE::TESForm*, std::uint16_t>& a_found)
+		{
+			if (IsEraWeapon(a_form, a_keywords)) {
+				auto [it, added] = a_found.try_emplace(a_form, a_level);
+				if (!added) {
+					it->second = (std::min)(it->second, a_level);
+				}
+				return;
+			}
+			auto* list = a_form ? a_form->As<RE::TESLevItem>() : nullptr;
+			if (!list || !a_visited.insert(list).second) {
+				return;
+			}
+			for (const auto& entry : list->entries) {
+				CollectEraWeapons(entry.form, (std::max)(a_level, entry.level), a_keywords, a_visited, a_found);
+			}
+		}
+
+		// Everything a list can give, sub-lists included.
+		void CollectAll(RE::TESForm* a_form, std::unordered_set<RE::TESForm*>& a_out)
+		{
+			if (!a_form || !a_out.insert(a_form).second) {
+				return;
+			}
+			if (auto* list = a_form->As<RE::TESLevItem>()) {
+				for (const auto& entry : list->entries) {
+					CollectAll(entry.form, a_out);
+				}
+			}
+		}
+
+		// Copies of era lists with the era weapons of their sources, by "family|list". Made once per
+		// session, refilled at each application.
+		std::map<std::string, RE::TESLevItem*> eraCopies;
+
+		// The era list, or a copy of it that also holds the era weapons found in its generic sources
+		// and not already in it. The era list itself is never changed: draugr carry it too.
+		RE::TESLevItem* WithEraWeapons(const std::string& a_family, RE::TESLevItem* a_era, const std::vector<RE::TESForm*>& a_sources,
+			const std::vector<RE::BGSKeyword*>& a_keywords, std::uint32_t& a_count)
+		{
+			std::map<RE::TESForm*, std::uint16_t> found;
+			std::unordered_set<RE::TESLevItem*>   visited;
+			for (auto* source : a_sources) {
+				CollectEraWeapons(source, 1, a_keywords, visited, found);
+			}
+			std::unordered_set<RE::TESForm*> already;
+			CollectAll(a_era, already);
+			// Only an era list of plain weapons takes them (not the enchanted or special loot lists).
+			const bool plain = std::ranges::any_of(already, [](RE::TESForm* a_form) {
+				auto* weap = a_form->As<RE::TESObjectWEAP>();
+				return weap && !weap->formEnchanting;
+			});
+			if (!plain) {
+				return a_era;
+			}
+			std::erase_if(found, [&](const auto& a_pair) { return already.contains(a_pair.first); });
+			if (found.empty()) {
+				return a_era;
+			}
+
+			auto*& copy = eraCopies[std::format("{}|{}", a_family, Forms::Label(a_era))];
+			if (!copy) {
+				auto* factory = RE::IFormFactory::GetConcreteFormFactoryByType<RE::TESLevItem>();
+				copy = factory ? factory->Create() : nullptr;
+			}
+			if (!copy) {
+				logger::error("[Era] {}: leveled list factory failed, {} keeps its pieces only", a_family, Forms::Label(a_era));
+				return a_era;
+			}
+
+			std::vector<RE::LEVELED_OBJECT> entries(a_era->entries.begin(), a_era->entries.end());
+			std::string                     text;
+			for (const auto& [form, level] : found) {
+				if (entries.size() >= 255) {
+					logger::warn("[Era] {}: {} is full (255 entries), some era weapons are left out", a_family, Forms::Label(a_era));
+					break;
+				}
+				entries.push_back({ form, 1, level, 0, nullptr });
+				text += std::format("{}{} (lvl {})", text.empty() ? "" : " ; ", Forms::Named(form), level);
+				++a_count;
+			}
+			std::ranges::stable_sort(entries, {}, &RE::LEVELED_OBJECT::level);  // the engine reads entries by rising level
+			copy->entries.resize(static_cast<std::uint32_t>(entries.size()));
+			for (std::uint32_t i = 0; i < entries.size(); ++i) {
+				copy->entries[i] = entries[i];
+			}
+			copy->numEntries = static_cast<std::uint8_t>(entries.size());
+			copy->chanceNone = a_era->chanceNone;
+			copy->llFlags = a_era->llFlags;
+			copy->chanceGlobal = a_era->chanceGlobal;
+			logger::info("[Era] {}: {} + {} era weapons from its generic sources, as 0x{:08X}: {}", a_family, Forms::Label(a_era),
+				entries.size() - a_era->entries.size(), copy->GetFormID(), text);
+			return copy;
+		}
+
 		void ApplyFamily(const std::string& a_name, const Config::Family& a_family)
 		{
 			const char* name = a_name.c_str();
@@ -265,21 +395,34 @@ namespace Swap
 			report.family = a_name;
 
 			// Generic list -> era list. A missing plugin only drops its own forms.
-			std::unordered_map<RE::TESForm*, RE::TESLevItem*> table;
-			std::unordered_set<RE::TESLevItem*>               targetsSet;
+			std::vector<std::pair<RE::TESLevItem*, std::vector<RE::TESForm*>>> bySource;  // era list -> its sources, in config order
 			for (const auto& rep : a_family.replace) {
 				auto* toList = Target(rep.to);
 				if (!toList) {
 					logger::warn("[Swap] {}: target {} not found or not a leveled list, its {} sources are skipped", name, rep.to, rep.from.size());
 					continue;
 				}
-				targetsSet.insert(toList);
+				auto it = std::ranges::find(bySource, toList, &decltype(bySource)::value_type::first);
+				auto& sources = it != bySource.end() ? it->second : bySource.emplace_back(toList, std::vector<RE::TESForm*>{}).second;
 				for (const auto& ref : rep.from) {
 					if (auto* from = Forms::Resolve(ref)) {
-						table[from] = toList;
+						sources.push_back(from);
 					} else {
 						logger::debug("[Swap] {}: source {} not loaded, skipped", name, ref);
 					}
+				}
+			}
+
+			// Era weapons that mods put in the generic lists: the era list is copied with them.
+			const auto keywords = EraKeywords(a_family.eraKeywords);
+			std::unordered_map<RE::TESForm*, RE::TESLevItem*> table;
+			std::unordered_set<RE::TESLevItem*>               targetsSet;
+			for (auto& [toList, sources] : bySource) {
+				targetsSet.insert(toList);
+				auto* target = keywords.empty() ? toList : WithEraWeapons(a_name, toList, sources, keywords, report.eraWeapons);
+				targetsSet.insert(target);
+				for (auto* from : sources) {
+					table[from] = target;
 				}
 			}
 

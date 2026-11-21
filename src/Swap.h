@@ -23,6 +23,7 @@ namespace Swap
 		std::uint32_t                       entries{ 0 };
 		std::vector<RE::TESObjectCONT*>     chests;
 		std::uint32_t                       foundChests{ 0 };
+		std::uint32_t                       eraWeapons{ 0 };  // era weapons brought back from the generic lists
 		std::uint32_t                       chestEntries{ 0 };
 		std::unordered_set<RE::TESLevItem*> sharedSublists;  // hold generic lists, shared with the world: kept
 	};

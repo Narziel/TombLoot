@@ -203,6 +203,11 @@
 			"Skyrim.esm|0x020670"      // TreasDraugrChest (10 % special loot in the base game)
 		],
 
+		// Weapons with one of these material keywords that a mod put in the generic lists (Reforging
+		// does, for its Ancient Nord weapons) are added to the era list that replaces them, so they
+		// stay in tombs. [] turns it off.
+		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
+
 		// Generic list -> era list. Only the entry's object changes: level and count stay.
 		"replace": [
 			{
@@ -376,6 +381,7 @@
 			"Dragonborn.esm|0x02AAC2", // DLC2TreasDraugrChestBoss
 			"Dragonborn.esm|0x02AAC1"  // DLC2TreasDraugrChest (10 % special loot)
 		],
+		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
 		"replace": [
 			{
 				"to": "@solstheim_special",
@@ -508,6 +514,7 @@
 			"Skyrim.esm|0x02069A",     // TreasDwarvenChestLarge
 			"Skyrim.esm|0x020650"      // TreasDwarvenChestSmall
 		],
+		"era_keywords": [ "WeapMaterialDwarven" ],
 		"replace": [
 			{
 				"to": "Skyrim.esm|0x070C21", // LItemDwarvenOnlyWeapons

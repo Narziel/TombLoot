@@ -11,7 +11,8 @@ At data load (and again at each game load), for each family of tombs (`nordic`, 
 1. The **generic lists** found in the tomb loot lists (`LItemWeaponSword`, `LItemArmorCuirassAny`, `LItemEnchWeaponAny`…) are replaced by an **era list** (`LItemDraugr02Weapon1H`, a list of Ancient Nord armor made at launch, Dwarven lists…). Only the entry's object changes: level, count and chance none stay as the load order set them.
 2. The **chests** that hold a tomb list directly are found by themselves, and their special loot (shared with other chests) is replaced in those chests only.
 3. **Mod sub-lists** used only by tomb lists and chests, that hold generic lists themselves, are found by themselves too. A list shared with the rest of the world (NPC inventories, death items, outfits, other chests) is never touched.
-4. The original entries are kept and put back before each new application: a changed config applies cleanly, and removing the mod gives the old loot back.
+4. **Era weapons in generic lists**: weapons carrying an era material keyword (`"era_keywords"`, `WeapMaterialDraugr`…) that a mod put in the replaced generic lists are added to a copy of the era list made at launch, so they are not lost in tombs. The era list itself, also carried by draugr, is not changed.
+5. The original entries are kept and put back before each new application: a changed config applies cleanly, and removing the mod gives the old loot back.
 
 A short report in `Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log` tells what each family's chests can give, and the path of any gear of the wrong era.
 

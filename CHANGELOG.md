@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Ancient Nord and Dwarven weapons that a mod puts in the generic lists (Reforging - To the Masses does) now stay in tombs: weapons with an era material keyword found in the replaced lists are added to the era list (a copy made at launch; the era list carried by draugr is not changed). `"era_keywords"` in each family of the config; `[]` turns it off.
+- Checked against the Address Library databases of SE 1.5.97 and 1.7.99: every address the plugin uses exists there.
+
 ## 1.0.0
 
 First release.
