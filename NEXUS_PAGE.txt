@@ -139,7 +139,7 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
 
-TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (tag v1.0.0) and in the Files tab ([b]TombLoot source[/b]). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
+TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.1.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
 
 [center][i][color=#9fb8bd]May the dead keep their own.[/color][/i][/center]
 
