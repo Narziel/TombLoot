@@ -239,6 +239,8 @@
 			"Skyrim.esm|0x0B5561",     // LootDraugrEnchArmor15
 			"Skyrim.esm|0x0B5562",     // LootDraugrEnchArmor25
 			"Skyrim.esm|0x034902",     // LootDraugrEnchArmor100
+			"Skyrim.esm|0x08850E",     // LootDraugrArrows15 (barrow chests: generic arrows until 1.2)
+			"Skyrim.esm|0x0B4203",     // LootDraugrArrows100
 			"Skyrim.esm|0x04F78C",     // DeathItemDraugrGold (coins on the draugr)
 			"Skyrim.esm|0x03AD7E"      // DeathItemDragonPriest (gold of the dragon priests)
 		],
@@ -572,7 +574,11 @@
 			"Skyrim.esm|0x070C10",     // LootDwarvenEnchArmor100
 			"Skyrim.esm|0x070C11",     // LootDwarvenEnchArmor20
 			"Skyrim.esm|0x070C12",     // LootDwarvenEnchWeapons100
-			"Skyrim.esm|0x070C13"      // LootDwarvenEnchWeapons20
+			"Skyrim.esm|0x070C13",     // LootDwarvenEnchWeapons20
+			// Solstheim's Dwemer ruins (Dragonborn lists).
+			"Dragonborn.esm|0x02C44C", "Dragonborn.esm|0x02C44D", "Dragonborn.esm|0x02C44E", "Dragonborn.esm|0x02C44F", // DLC2LootDwarvenArmor15, Weapon15, EnchWeapon20, EnchArmor20
+			"Dragonborn.esm|0x02C450", // DLC2LootDwarvenChestBossBase
+			"Dragonborn.esm|0x02C451", "Dragonborn.esm|0x02C452", "Dragonborn.esm|0x02C453", "Dragonborn.esm|0x02C454"  // DLC2LootDwarvenArmor100, Weapon100, EnchArmor100, EnchWeapon100
 		],
 		// The special loot (100 % and 10 %) is shared with other chests: replaced in these chests only.
 		"containers": [
@@ -592,32 +598,40 @@
 				"to": "Skyrim.esm|0x070C21", // LItemDwarvenOnlyWeapons
 				"from": [
 					"Skyrim.esm|0x016578", "Skyrim.esm|0x016579", "Skyrim.esm|0x016577", "Skyrim.esm|0x017178", "Skyrim.esm|0x0165BA",
-					"Skyrim.esm|0x01657C", "Skyrim.esm|0x01657A", "Skyrim.esm|0x0165B8", "Skyrim.esm|0x0165B9", "Skyrim.esm|0x017024"
+					"Skyrim.esm|0x01657C", "Skyrim.esm|0x01657A", "Skyrim.esm|0x0165B8", "Skyrim.esm|0x0165B9", "Skyrim.esm|0x017024",
+					"Dragonborn.esm|0x02BC12", "Dragonborn.esm|0x02BC13", "Dragonborn.esm|0x02BC11", "Dragonborn.esm|0x02BC0F", // DLC2LItemWeapon*
+					"Dragonborn.esm|0x02BC0D", "Dragonborn.esm|0x02BC10", "Dragonborn.esm|0x02BC14", "Dragonborn.esm|0x02BC0E"
 				]
 			},
 			{
 				"to": "Skyrim.esm|0x070C0D", // LootDwarvenArrows100
-				"from": [ "Skyrim.esm|0x068839" ] // LItemArrowsAll
+				"from": [ "Skyrim.esm|0x068839", "Dragonborn.esm|0x02BC16" ] // LItemArrowsAll, DLC2LItemArrowsAll
 			},
 			{
 				"to": "Skyrim.esm|0x070C20", // LItemDwarvenOnlyArmor
-				"from": [ "Skyrim.esm|0x0165E6", "Skyrim.esm|0x016739", "Skyrim.esm|0x01673C", "Skyrim.esm|0x016742", "Skyrim.esm|0x016743" ]
+				"from": [ "Skyrim.esm|0x0165E6", "Skyrim.esm|0x016739", "Skyrim.esm|0x01673C", "Skyrim.esm|0x016742", "Skyrim.esm|0x016743",
+					"Dragonborn.esm|0x02BC19", "Dragonborn.esm|0x02BC1A", "Dragonborn.esm|0x02BC1B", "Dragonborn.esm|0x02BC1C", "Dragonborn.esm|0x02BC1D", // DLC2LItemArmor*
+					"Dragonborn.esm|0x02BC1E", "Dragonborn.esm|0x02BC1F", "Dragonborn.esm|0x02BC20", "Dragonborn.esm|0x02BC21", "Dragonborn.esm|0x02BC22" ]
 			},
 			{
 				"to": "@dwemer_ench_weapon",
-				"from": [ "Skyrim.esm|0x04B58C" ] // LItemEnchWeaponAny
+				"from": [
+					"Skyrim.esm|0x04B58C",     // LItemEnchWeaponAny
+					"Dragonborn.esm|0x02BC0A", "Dragonborn.esm|0x02BC0B", // DLC2LItemEnchWeapon1H, 2H
+					"Dragonborn.esm|0x02C447"  // DLC2LootDraugrEnchWeapons100, in the Solstheim Dwemer boss chests
+				]
 			},
 			{
 				"to": "@dwemer_ench_armor",
-				"from": [ "Skyrim.esm|0x0B555F", "Skyrim.esm|0x0B5560" ] // LItemEnchArmorHeavyAll, LightAll
+				"from": [ "Skyrim.esm|0x0B555F", "Skyrim.esm|0x0B5560", "Dragonborn.esm|0x02BC00", "Dragonborn.esm|0x02BC01" ] // LItemEnchArmorHeavyAll, LightAll and DLC2
 			},
 			{
 				"to": "@dwemer_special",
-				"from": [ "Skyrim.esm|0x1031D0" ] // 100 % special loot
+				"from": [ "Skyrim.esm|0x1031D0", "Dragonborn.esm|0x02BC3F" ] // 100 % special loot (Skyrim, Dragonborn)
 			},
 			{
 				"to": "@dwemer_special10",
-				"from": [ "Skyrim.esm|0x10B2C0" ] // 10 % special loot
+				"from": [ "Skyrim.esm|0x10B2C0", "Dragonborn.esm|0x02BC2F" ] // 10 % special loot (Skyrim, Dragonborn)
 			}
 		]
 	}
