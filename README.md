@@ -12,7 +12,7 @@ At data load (and again at each game load), for each family of tombs (`nordic`, 
 2. The **chests** that hold a tomb list directly are found by themselves, and their special loot (shared with other chests) is replaced in those chests only.
 3. **Mod sub-lists** used only by tomb lists and chests, that hold generic lists themselves, are found by themselves too. A list shared with the rest of the world (NPC inventories, death items, outfits, other chests) is never touched.
 4. **Era weapons in generic lists**: weapons carrying an era material keyword (`"era_keywords"`, `WeapMaterialDraugr`…) that a mod put in the replaced generic lists are added to a copy of the era list made at launch, so they are not lost in tombs. The era list itself, also carried by draugr, is not changed.
-5. **Treasure instead of septims**: the tombs' gold lists, the coins put straight in their chests and their loose change point to lists of ingots, ore and gems of the same average value, made at launch (`ancient_treasure`, `dwemer_treasure`…).
+5. **Treasure instead of septims**: the tombs' gold lists, the coins put straight in their chests and their loose change point to lists of ingots, ore and gems of the same average value, made at launch (`ancient_treasure`, `dwemer_treasure`…). `"treasure": false` turns it off; it is off by itself when a coin mod listed in `"treasure_unless"` (C.O.I.N.) is loaded.
 6. The original entries are kept and put back before each new application: a changed config applies cleanly, and removing the mod gives the old loot back.
 
 A short report in `Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log` tells what each family's chests can give, and the path of any gear of the wrong era.

@@ -10,6 +10,7 @@ struct Config
 	{
 		std::string              to;
 		std::vector<std::string> from;
+		bool                     treasure{ false };  // a gold replacement, off with "treasure": false or a coin mod
 	};
 
 	struct Family
@@ -51,6 +52,10 @@ struct Config
 		kFull      // plus the detailed survey of every tomb list
 	};
 	Survey                             survey{ Survey::kSummary };
+	// Treasure instead of septims: the replacements marked "treasure" apply only if this is on and
+	// none of `treasureUnless` is loaded (a coin mod, C.O.I.N., already gives tombs their own coins).
+	bool                               treasure{ true };
+	std::vector<std::string>           treasureUnless;
 	std::vector<std::string>           ancientPlugins;
 	std::vector<std::string>           ancientItems;  // gear of the era with no material keyword (survey only)
 	std::map<std::string, CreatedList> created;

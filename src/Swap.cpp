@@ -391,7 +391,7 @@ namespace Swap
 			return copy;
 		}
 
-		void ApplyFamily(const std::string& a_name, const Config::Family& a_family)
+		void ApplyFamily(const std::string& a_name, const Config::Family& a_family, bool a_treasure)
 		{
 			const char* name = a_name.c_str();
 			auto&       report = reports.emplace_back();
@@ -400,6 +400,9 @@ namespace Swap
 			// Generic list -> era list. A missing plugin only drops its own forms.
 			std::vector<std::pair<RE::TESLevItem*, std::vector<RE::TESForm*>>> bySource;  // era list -> its sources, in config order
 			for (const auto& rep : a_family.replace) {
+				if (rep.treasure && !a_treasure) {
+					continue;
+				}
 				auto* toList = Target(rep.to);
 				if (!toList) {
 					logger::warn("[Swap] {}: target {} not found or not a leveled list, its {} sources are skipped", name, rep.to, rep.from.size());
@@ -536,8 +539,16 @@ namespace Swap
 				}
 			}
 		}
+		// Treasure instead of septims: off in the config, or left to a coin mod that is loaded.
+		bool treasure = a_config.treasure;
+		if (!treasure) {
+			logger::info("[Treasure] off in the config: tomb gold stays as the load order set it");
+		} else if (auto it = std::ranges::find_if(a_config.treasureUnless, Loaded); it != a_config.treasureUnless.end()) {
+			treasure = false;
+			logger::info("[Treasure] {} is loaded: tomb gold is left to it", *it);
+		}
 		for (const auto& [name, family] : a_config.families) {
-			ApplyFamily(name, family);
+			ApplyFamily(name, family, treasure);
 		}
 	}
 }

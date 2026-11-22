@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+- C.O.I.N. - Coins of Interesting Nature: when `C.O.I.N.esp` is loaded, the treasure replacements are skipped and tomb gold is left to its ancient coins (`"treasure_unless"`). Era gear is still replaced.
+- `"treasure": false` at the top of the config keeps septims in tombs; the gold replacements are marked `"treasure": true`.
+- Roleplaying in Skyrim - Loot Overhaul: its barrow and Dwemer chest gold lists (`rr_Loot_Gold_Draugr`, `rr_Loot_Gold_Dwarven`) are tomb lists, so their septims become treasure too. Skipped when it is not loaded.
+
 ## 1.2.0
 
 - Treasure instead of septims: the gold of Nordic barrows (boss chests, dragon priests, draugr, the 20 coins of ordinary chests, loose change in chests and alcove corpses) and of Dwemer ruins becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the same average value, at the same levels. Solstheim's boss chests can give stalhrim. To keep septims, remove the gold replacements in the config.

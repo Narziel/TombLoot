@@ -37,7 +37,7 @@ namespace
 				if (!r.is_object() || !r.contains("to") || !r["to"].is_string()) {
 					continue;
 				}
-				family.replace.push_back({ r["to"].get<std::string>(), Strings(r, "from") });
+				family.replace.push_back({ r["to"].get<std::string>(), Strings(r, "from"), r.value("treasure", false) });
 			}
 		}
 		return family;
@@ -63,6 +63,8 @@ Config Config::Load()
 				cfg.survey = mode == "off" ? Config::Survey::kOff : mode == "full" ? Config::Survey::kFull : Config::Survey::kSummary;
 			}
 		}
+		cfg.treasure = json.value("treasure", true);
+		cfg.treasureUnless = Strings(json, "treasure_unless");
 		cfg.ancientPlugins = Strings(json, "ancient_plugins");
 		cfg.ancientItems = Strings(json, "ancient_items");
 		if (auto it = json.find("created_lists"); it != json.end() && it->is_object()) {

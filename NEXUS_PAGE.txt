@@ -53,7 +53,7 @@ In Skyrim, a barrow sealed for three thousand years draws its treasure from the 
 [*][color=#bfe3ea][b]Nordic barrows[/b][/color] — Ancient Nord blades and honed steel, Ancient Nord armor, draugr arrows, and the frost-enchanted weapons of the draugr lords. The great boss chests hold the finest pieces of the age.
 [*][color=#bfe3ea][b]The barrows of Solstheim[/b][/color] — The same ancient gear, and at high level, [b]stalhrim[/b]: the enchanted ice that only the ancient Nords of Solstheim knew how to work. You will find it there, and nowhere else.
 [*][color=#bfe3ea][b]Dwemer ruins[/b][/color] — Dwarven weapons, Dwarven armor, enchanted Dwarven gear, in Skyrim and on Solstheim. The Deep Folk did not forge steel shields.
-[*][color=#bfe3ea][b]Treasure, not septims[/b][/color] — The Septim coin was struck in the Second Era, long after these tombs were sealed. Their gold becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the [b]same value[/b], at the same levels. Worth as much, but you have to sell it.
+[*][color=#bfe3ea][b]Treasure, not septims[/b][/color] — The Septim coin was struck in the Second Era, long after these tombs were sealed. Their gold becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the [b]same value[/b], at the same levels. Worth as much, but you have to sell it. Prefer septims? One line in the config turns it off. With C.O.I.N., it steps aside by itself and leaves the tombs to its ancient coins.
 [*][color=#bfe3ea][b]The highest levels[/b][/color] — Ebony comes at level 38, as Bethesda intended. With Open World Loot or MorrowLoot Ultimate, which ban random ebony, it stays out by itself.
 [/list]
 
@@ -97,6 +97,8 @@ TombLoot does not live in a plugin. It works [b]at launch, in memory, after ever
 [*][b]Ancient Nord Armoury EXTREME[/b] — recommended, tested. Its ancient pieces and enchanted pieces fill the tombs; its Nordic carved and iron entries are left out of the tombs.
 [*][b]Dragon Cult Weapons[/b] — tested. Its draugr sub-lists are fixed, its cult weapons stay.
 [*][b]DynamicContainerLoot[/b] — tested. TombLoot runs after it.
+[*][b]C.O.I.N.[/b] — tested. Its ancient coins already replace tomb septims, so TombLoot leaves the gold to it and only changes the gear.
+[*][b]Roleplaying in Skyrim - Loot Overhaul[/b] — tested. Era gear works and its tomb gold becomes treasure too. Its enchanted Dwarven and stalhrim lists mix materials by rarity, so an odd glass or ebony piece can still show up.
 [*][b]Bashed Patch, Synthesis, Wrye Bash merges[/b] — this is exactly what TombLoot was made for.
 [*][b]Weapon and armor mods[/b] — their items stay everywhere in the world, except in ancient tombs.
 [*][b]Dungeon and barrow mods[/b] — covered when they reuse the vanilla tomb lists; otherwise their lists can be added to the config in one line.
@@ -140,7 +142,7 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
 
-TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.2.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
+TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.2.1). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
 
 [center][i][color=#9fb8bd]May the dead keep their own.[/color][/i][/center]
 
@@ -226,6 +228,11 @@ TombLoot is released under the GNU General Public License v3 or later. You may u
 ---------------------------------------------------------------------
 ONGLET « Logs » (changelog, une ligne par point)
 ---------------------------------------------------------------------
+
+1.2.1
+- C.O.I.N.: when it is loaded, tomb gold is left to its ancient coins.
+- New "treasure" option in the config: false keeps septims in tombs.
+- Roleplaying in Skyrim - Loot Overhaul: its barrow and Dwemer gold lists become treasure too.
 1.2.0
 - Treasure instead of septims: the gold of barrows (boss chests, dragon priests, draugr, chest coins and loose change) and Dwemer ruins becomes ingots, ore and gems of the same value, at the same levels.
 - Barrow chests now give draugr arrows (two arrow lists were missed since 1.0).

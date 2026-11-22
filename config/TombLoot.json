@@ -7,6 +7,12 @@
 	// tomb list) or "off".
 	"survey": "summary",
 
+	// Treasure instead of septims (see "ancient_treasure"): the replacements marked "treasure".
+	// false keeps the septims in tombs. Off by itself when a coin mod listed in "treasure_unless" is
+	// loaded: C.O.I.N. already gives barrows and Dwemer ruins their own ancient coins.
+	"treasure": true,
+	"treasure_unless": [ "C.O.I.N.esp" ],
+
 	// Era-appropriate items with no material keyword, for the report only.
 	"ancient_items": [ "Dragonborn.esm|0x0398E6" ], // Ancient Nord Pickaxe
 
@@ -177,7 +183,7 @@
 		// Treasure instead of septims. The Septim coin dates from the Second Era; the dead of the
 		// barrows and the Dwemer were gone long before. Their gold becomes bullion, ore and gems of the
 		// same average value, at the same levels: worth as much, but it must be sold (or worked).
-		// To keep septims in tombs, remove the "gold" replacements of each family below.
+		// To keep septims in tombs, set "treasure" to false at the top of this file.
 		// Values: silver ingot 50, gold ore 50, gold ingot 100, garnet 100, flawless garnet 150,
 		// amethyst 120, ruby 200, Dwarven metal ingot 30, Dwarven scrap metal 15, silver ore 25, cog 5.
 		// Boss chest gold (50, 100, 150, 200, 250 coins at levels 1, 6, 11, 16, 21; one amount, the
@@ -242,7 +248,8 @@
 			"Skyrim.esm|0x08850E",     // LootDraugrArrows15 (barrow chests: generic arrows until 1.2)
 			"Skyrim.esm|0x0B4203",     // LootDraugrArrows100
 			"Skyrim.esm|0x04F78C",     // DeathItemDraugrGold (coins on the draugr)
-			"Skyrim.esm|0x03AD7E"      // DeathItemDragonPriest (gold of the dragon priests)
+			"Skyrim.esm|0x03AD7E",     // DeathItemDragonPriest (gold of the dragon priests)
+			"RoleRim - Loot.esp|0x000211"  // rr_Loot_Gold_Draugr (Roleplaying in Skyrim - Loot Overhaul: barrow chest gold)
 		],
 
 		// Chests whose own entries are replaced: their special loot is a list shared with 35 chests
@@ -268,11 +275,12 @@
 				"from": [
 					"Skyrim.esm|0x088513",     // LootDraugrGoldBoss01
 					"Skyrim.esm|0x088512"      // LootDraugrGold
-				]
+				],
+				"treasure": true
 			},
-			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ] },      // Gold001, coins put straight in a chest
-			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ] },    // LootGoldChange
-			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ] },  // LootGoldChange25
+			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ], "treasure": true },      // Gold001, coins put straight in a chest
+			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ], "treasure": true },    // LootGoldChange
+			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ], "treasure": true },  // LootGoldChange25
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
 				"from": [
@@ -447,10 +455,10 @@
 		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
 		"replace": [
 			// Gold: treasure of the same value, with stalhrim (see "ancient_treasure").
-			{ "to": "@solstheim_treasure", "from": [ "Skyrim.esm|0x088513", "Skyrim.esm|0x088512" ] },  // LootDraugrGoldBoss01, LootDraugrGold
-			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ] },      // Gold001
-			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ] },    // LootGoldChange
-			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ] },  // LootGoldChange25
+			{ "to": "@solstheim_treasure", "from": [ "Skyrim.esm|0x088513", "Skyrim.esm|0x088512" ], "treasure": true },  // LootDraugrGoldBoss01, LootDraugrGold
+			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ], "treasure": true },      // Gold001
+			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ], "treasure": true },    // LootGoldChange
+			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ], "treasure": true },  // LootGoldChange25
 			{
 				"to": "@solstheim_special",
 				"from": [
@@ -578,7 +586,8 @@
 			// Solstheim's Dwemer ruins (Dragonborn lists).
 			"Dragonborn.esm|0x02C44C", "Dragonborn.esm|0x02C44D", "Dragonborn.esm|0x02C44E", "Dragonborn.esm|0x02C44F", // DLC2LootDwarvenArmor15, Weapon15, EnchWeapon20, EnchArmor20
 			"Dragonborn.esm|0x02C450", // DLC2LootDwarvenChestBossBase
-			"Dragonborn.esm|0x02C451", "Dragonborn.esm|0x02C452", "Dragonborn.esm|0x02C453", "Dragonborn.esm|0x02C454"  // DLC2LootDwarvenArmor100, Weapon100, EnchArmor100, EnchWeapon100
+			"Dragonborn.esm|0x02C451", "Dragonborn.esm|0x02C452", "Dragonborn.esm|0x02C453", "Dragonborn.esm|0x02C454",  // DLC2LootDwarvenArmor100, Weapon100, EnchArmor100, EnchWeapon100
+			"RoleRim - Loot.esp|0x000212"  // rr_Loot_Gold_Dwarven (Roleplaying in Skyrim - Loot Overhaul: Dwemer chest gold)
 		],
 		// The special loot (100 % and 10 %) is shared with other chests: replaced in these chests only.
 		"containers": [
@@ -592,8 +601,8 @@
 		"era_keywords": [ "WeapMaterialDwarven" ],
 		"replace": [
 			// Gold: Dwarven metal and gems of the same value (see "ancient_treasure").
-			{ "to": "@dwemer_treasure", "from": [ "Skyrim.esm|0x101DAA" ] },   // LootDwarvenGoldBoss
-			{ "to": "@dwemer_change", "from": [ "Skyrim.esm|0x037C2B" ] },     // LootGoldChange
+			{ "to": "@dwemer_treasure", "from": [ "Skyrim.esm|0x101DAA" ], "treasure": true },   // LootDwarvenGoldBoss
+			{ "to": "@dwemer_change", "from": [ "Skyrim.esm|0x037C2B" ], "treasure": true },     // LootGoldChange
 			{
 				"to": "Skyrim.esm|0x070C21", // LItemDwarvenOnlyWeapons
 				"from": [
