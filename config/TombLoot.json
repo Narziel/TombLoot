@@ -210,6 +210,8 @@
 		// Loose change (1 to 9 coins) in barrow chests and alcove corpses, and on the draugr.
 		"ancient_change": { "chance_none": 85, "items": [ "Skyrim.esm|0x05ACDF" ] },
 		"ancient_change25": { "chance_none": 96, "items": [ "Skyrim.esm|0x05ACDF" ] },
+		// The loose change of a ruin urn (1 to 9 coins, 5 on average): 1 in 5 is a nugget of silver ore.
+		"ancient_urn_change": { "chance_none": 80, "items": [ "Skyrim.esm|0x05ACDF" ] },
 		// Dwemer boss chest gold (50 to 250 coins at levels 1 to 21, one among all those reached).
 		"dwemer_treasure": { "items": [
 			{ "form": "Skyrim.esm|0x0DB8A2", "level": 1, "count": 2 },  // Dwarven metal ingots (60)
@@ -249,6 +251,7 @@
 			"Skyrim.esm|0x0B4203",     // LootDraugrArrows100
 			"Skyrim.esm|0x04F78C",     // DeathItemDraugrGold (coins on the draugr)
 			"Skyrim.esm|0x03AD7E",     // DeathItemDragonPriest (gold of the dragon priests)
+			"Skyrim.esm|0x10FCFC",     // LootUrnSmallTreasure30 (ruin urns; its gold list is shared with burnt corpses, so it is swapped here only)
 			"RoleRim - Loot.esp|0x000211"  // rr_Loot_Gold_Draugr (Roleplaying in Skyrim - Loot Overhaul: barrow chest gold)
 		],
 
@@ -281,6 +284,7 @@
 			{ "to": "@ancient_coin", "from": [ "Skyrim.esm|0x00000F" ], "treasure": true },      // Gold001, coins put straight in a chest
 			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ], "treasure": true },    // LootGoldChange
 			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ], "treasure": true },  // LootGoldChange25
+			{ "to": "@ancient_urn_change", "from": [ "Skyrim.esm|0x10FCFD" ], "treasure": true }, // LootUrnGoldChange (ruin urns)
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
 				"from": [

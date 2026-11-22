@@ -1,4 +1,8 @@
-# Changelog
+﻿# Changelog
+
+## 1.2.2
+
+- Ruin urns: their loose change (1 to 9 septims, in `LootUrnSmallTreasure30`) becomes silver ore of the same average value. Swapped only inside the urn list: the same gold list stays in burnt corpses and spider cocoons.
 
 ## 1.2.1
 
