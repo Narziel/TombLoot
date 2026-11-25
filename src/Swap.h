@@ -30,6 +30,10 @@ namespace Swap
 
 	void Apply(const Config& a_config);
 
+	// Weapons and armor placed by hand in the base game get an era piece when they load (config "placed").
+	void          InstallPlaced();
+	std::uint32_t PlacedSwapped();
+
 	// One report per family, from the last application.
 	const std::vector<Report>& Reports();
 }

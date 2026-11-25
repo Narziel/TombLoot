@@ -391,6 +391,227 @@ namespace Swap
 			return copy;
 		}
 
+		// --- Pieces placed by hand (altars, tables, floors of the base game) ---
+
+		// One family's table for placed pieces: generic piece -> the era lists of its replacements.
+		struct PlacedFamily
+		{
+			std::string                                                     name;
+			std::vector<std::string>                                        locTypes;
+			std::vector<std::string>                                        rootPlugins;
+			std::unordered_map<RE::TESForm*, std::vector<RE::TESLevItem*>> targets;
+		};
+		std::vector<PlacedFamily> placedFamilies;  // families with a root plugin come first (Solstheim before Skyrim)
+		std::shared_mutex         placedLock;      // the hook reads on the loading threads; Apply writes
+		std::atomic<std::uint32_t> placedSwapped{ 0 };
+
+		bool SameText(std::string_view a, std::string_view b)
+		{
+			return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](char x, char y) {
+				return std::tolower(static_cast<unsigned char>(x)) == std::tolower(static_cast<unsigned char>(y));
+			});
+		}
+
+		// Placed by Bethesda: the reference comes from a base game master.
+		bool OfficialFile(const RE::TESFile* a_file)
+		{
+			if (!a_file) {
+				return false;
+			}
+			const std::string_view name = a_file->GetFilename();
+			return std::ranges::any_of(std::array{ "Skyrim.esm"sv, "Update.esm"sv, "Dawnguard.esm"sv, "HearthFires.esm"sv, "Dragonborn.esm"sv },
+				[&](std::string_view a_official) { return SameText(name, a_official); });
+		}
+
+		// What a piece is, for an era piece of the same kind: 100 + weapon type, or the armor's main slot
+		// (1 head, 2 body, 3 hands, 4 feet, 5 shield). 0: not a piece to replace (clothes, jewelry, staves…).
+		int KindOf(const RE::TESForm* a_form)
+		{
+			if (const auto* weap = a_form ? a_form->As<RE::TESObjectWEAP>() : nullptr) {
+				const auto type = weap->GetWeaponType();
+				return type == RE::WEAPON_TYPE::kHandToHandMelee || type == RE::WEAPON_TYPE::kStaff ? 0 : 100 + static_cast<int>(type);
+			}
+			const auto* armor = a_form ? a_form->As<RE::TESObjectARMO>() : nullptr;
+			if (!armor || armor->GetArmorType() == RE::BGSBipedObjectForm::ArmorType::kClothing) {
+				return 0;
+			}
+			using Slot = RE::BGSBipedObjectForm::BipedObjectSlot;
+			const auto slots = armor->GetSlotMask();
+			return armor->IsShield()          ? 5 :
+			       slots.any(Slot::kBody)     ? 2 :
+			       slots.any(Slot::kHands)    ? 3 :
+			       slots.any(Slot::kFeet)     ? 4 :
+			       slots.any(Slot::kHead, Slot::kHair) ? 1 :
+			                                    0;
+		}
+
+		bool Enchanted(const RE::TESForm* a_form)
+		{
+			if (const auto* weap = a_form->As<RE::TESObjectWEAP>()) {
+				return weap->formEnchanting != nullptr;
+			}
+			const auto* armor = a_form->As<RE::TESObjectARMO>();
+			return armor && armor->formEnchanting != nullptr;
+		}
+
+		// Every weapon and armor piece a list can give, with the lowest level it comes at.
+		void CollectPieces(RE::TESForm* a_form, std::uint16_t a_level, std::unordered_set<RE::TESLevItem*>& a_visited,
+			std::map<RE::TESBoundObject*, std::uint16_t>& a_out)
+		{
+			if (auto* list = a_form ? a_form->As<RE::TESLevItem>() : nullptr) {
+				if (a_visited.insert(list).second) {
+					for (const auto& entry : list->entries) {
+						CollectPieces(entry.form, (std::max)(a_level, entry.level), a_visited, a_out);
+					}
+				}
+				return;
+			}
+			if (a_form && (a_form->Is(RE::FormType::Weapon) || a_form->Is(RE::FormType::Armor))) {
+				auto [it, added] = a_out.try_emplace(static_cast<RE::TESBoundObject*>(a_form), a_level);
+				if (!added) {
+					it->second = (std::min)(it->second, a_level);
+				}
+			}
+		}
+
+		bool PlaceMatches(const PlacedFamily& a_family, const RE::BGSLocation* a_location)
+		{
+			bool typed = false;
+			const RE::BGSLocation* root = a_location;
+			for (const auto* loc = a_location; loc; loc = loc->parentLoc) {
+				typed = typed || std::ranges::any_of(a_family.locTypes, [&](const auto& a_type) { return loc->HasKeywordString(a_type); });
+				root = loc;
+			}
+			if (!typed) {
+				return false;
+			}
+			if (a_family.rootPlugins.empty()) {
+				return true;
+			}
+			const auto* file = root->GetFile(0);
+			return file && std::ranges::any_of(a_family.rootPlugins, [&](const auto& a_plugin) { return SameText(file->GetFilename(), a_plugin); });
+		}
+
+		// Before the piece loads: a generic piece placed by Bethesda in a tomb becomes an era piece of the same
+		// kind, chosen by its reference (the same each time, nothing in the save; without TombLoot it comes back).
+		void SwapPlaced(RE::TESObjectREFR* a_ref)
+		{
+			auto* base = a_ref ? a_ref->GetBaseObject() : nullptr;
+			if (!base || !(base->Is(RE::FormType::Weapon) || base->Is(RE::FormType::Armor)) || a_ref->IsPersistent() || !OfficialFile(a_ref->GetFile(0))) {
+				return;
+			}
+			std::shared_lock lock{ placedLock };
+			const auto       found = std::ranges::find_if(placedFamilies, [&](const auto& a_f) { return a_f.targets.contains(base); });
+			if (found == placedFamilies.end()) {
+				return;
+			}
+			const int kind = KindOf(base);
+			if (kind == 0 || a_ref->GetOwner() || a_ref->extraList.HasType(RE::ExtraDataType::kEnchantment)) {
+				return;
+			}
+			const auto* cell = a_ref->GetParentCell();
+			const auto* location = cell ? cell->GetLocation() : nullptr;
+			if (!location) {
+				location = a_ref->GetEditorLocation();
+			}
+			if (!location) {
+				return;
+			}
+			for (const auto& family : placedFamilies) {
+				const auto it = family.targets.find(base);
+				if (it == family.targets.end() || !PlaceMatches(family, location)) {
+					continue;
+				}
+				std::map<RE::TESBoundObject*, std::uint16_t> pieces;
+				std::unordered_set<RE::TESLevItem*>          visited;
+				for (auto* list : it->second) {
+					CollectPieces(list, 1, visited, pieces);
+				}
+				const bool enchanted = Enchanted(base);
+				std::erase_if(pieces, [&](const auto& a_p) { return KindOf(a_p.first) != kind || Enchanted(a_p.first) != enchanted; });
+				if (pieces.empty()) {
+					return;  // no era piece of this kind (a mace…): it stays
+				}
+				// Among the pieces of the player's level; the lowest ones when none is reached yet.
+				const auto* player = RE::PlayerCharacter::GetSingleton();
+				const auto  level = static_cast<std::uint16_t>((std::max)(player ? static_cast<int>(player->GetLevel()) : 1, 1));
+				std::vector<RE::TESBoundObject*> choice;
+				for (const auto& [piece, min] : pieces) {
+					if (min <= level) {
+						choice.push_back(piece);
+					}
+				}
+				if (choice.empty()) {
+					const auto lowest = std::ranges::min_element(pieces, {}, [](const auto& a_p) { return a_p.second; })->second;
+					for (const auto& [piece, min] : pieces) {
+						if (min == lowest) {
+							choice.push_back(piece);
+						}
+					}
+				}
+				std::uint64_t seed = a_ref->GetFormID() * 0x9E3779B97F4A7C15ULL;
+				seed ^= seed >> 31;
+				auto* pick = choice[static_cast<std::size_t>(seed % choice.size())];
+				a_ref->SetObjectReference(pick);
+				placedSwapped.fetch_add(1);
+				const char* place = location->GetName();
+				logger::info("[Placed] {}: {} -> {} | ref 0x{:08X} | {}", family.name, Forms::Named(base), Forms::Named(pick), a_ref->GetFormID(),
+					place && *place ? place : Forms::Label(location));
+				return;
+			}
+		}
+
+		struct PlacedHook
+		{
+			static void thunk(RE::TESObjectREFR* a_ref)
+			{
+				SwapPlaced(a_ref);
+				func(a_ref);
+			}
+			static inline REL::Relocation<decltype(thunk)> func;
+		};
+
+		// The family's generic pieces and the era lists they go to (gear only: gold and treasure are not placed).
+		void RecordPlaced(const std::string& a_name, const Config::Family& a_family,
+			const std::vector<std::pair<RE::TESLevItem*, std::vector<RE::TESForm*>>>& a_bySource,
+			const std::unordered_map<RE::TESForm*, RE::TESLevItem*>& a_table, const std::vector<RE::BGSKeyword*>& a_eraKeywords)
+		{
+			if (a_family.placedLocTypes.empty()) {
+				return;
+			}
+			auto& family = placedFamilies.emplace_back();
+			family.name = a_name;
+			family.locTypes = a_family.placedLocTypes;
+			family.rootPlugins = a_family.placedRootPlugins;
+			for (const auto& [toList, sources] : a_bySource) {
+				for (auto* source : sources) {
+					auto* target = a_table.at(source);
+					std::unordered_set<RE::TESForm*> leaves;
+					CollectAll(source, leaves);
+					for (auto* leaf : leaves) {
+						const auto* kwForm = leaf->As<RE::BGSKeywordForm>();
+						const bool  era = kwForm && std::ranges::any_of(a_eraKeywords, [&](auto* kw) { return kwForm->HasKeyword(kw); });
+						if (era || KindOf(leaf) == 0) {
+							continue;
+						}
+						auto& lists = family.targets[leaf];
+						if (std::ranges::find(lists, target) == lists.end()) {
+							lists.push_back(target);
+						}
+					}
+				}
+			}
+			logger::info("[Placed] {}: {} generic pieces placed by hand in {} get an era piece{}", a_name, family.targets.size(),
+				[&] {
+					std::string text;
+					for (const auto& t : family.locTypes) {
+						text += (text.empty() ? "" : ", ") + t;
+					}
+					return text;
+				}(),
+				family.rootPlugins.empty() ? "" : " (root location from " + family.rootPlugins.front() + ")");
+		}
+
 		void ApplyFamily(const std::string& a_name, const Config::Family& a_family, bool a_treasure)
 		{
 			const char* name = a_name.c_str();
@@ -431,6 +652,8 @@ namespace Swap
 					table[from] = target;
 				}
 			}
+
+			RecordPlaced(a_name, a_family, bySource, table, keywords);
 
 			// 1. The family's lists: the configured ones.
 			std::vector<RE::TESLevItem*>        lists;
@@ -524,8 +747,22 @@ namespace Swap
 		return reports;
 	}
 
+	void InstallPlaced()
+	{
+		REL::Relocation<std::uintptr_t> vtable{ RE::VTABLE_TESObjectREFR[0] };
+		PlacedHook::func = vtable.write_vfunc(0x13, PlacedHook::thunk);  // InitItemImpl: before the piece loads
+		logger::info("[Placed] hook installed (InitItemImpl of TESObjectREFR)");
+	}
+
+	std::uint32_t PlacedSwapped()
+	{
+		return placedSwapped.load();
+	}
+
 	void Apply(const Config& a_config)
 	{
+		std::unique_lock lock{ placedLock };  // the placed pieces' hook waits while lists change
+		placedFamilies.clear();
 		Restore();
 		BuildCreated(a_config);
 		BuildUsers();
@@ -550,5 +787,7 @@ namespace Swap
 		for (const auto& [name, family] : a_config.families) {
 			ApplyFamily(name, family, treasure);
 		}
+		// A family bound to a root (Solstheim) is tried before the general one (Skyrim's barrows).
+		std::ranges::stable_partition(placedFamilies, [](const auto& a_f) { return !a_f.rootPlugins.empty(); });
 	}
 }

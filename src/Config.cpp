@@ -32,6 +32,10 @@ namespace
 		family.autoChests = it->value("auto_chests", true);
 		family.autoSublists = it->value("auto_sublists", true);
 		family.eraKeywords = Strings(*it, "era_keywords");
+		if (auto placed = it->find("placed"); placed != it->end() && placed->is_object()) {
+			family.placedLocTypes = Strings(*placed, "loc_types");
+			family.placedRootPlugins = Strings(*placed, "root_plugins");
+		}
 		if (auto rep = it->find("replace"); rep != it->end() && rep->is_array()) {
 			for (const auto& r : *rep) {
 				if (!r.is_object() || !r.contains("to") || !r["to"].is_string()) {

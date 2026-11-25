@@ -24,6 +24,12 @@ struct Config
 		// replacement, are added to its era list (a copy made at launch): a mod that puts its Ancient
 		// Nord weapons in LItemWeaponSword keeps them in tombs. Empty: off.
 		std::vector<std::string> eraKeywords;
+		// Weapons and armor placed by hand in the base game (altars, tables, floors) in these places get an
+		// era piece of the same kind when they load, through the family's replacements. A place matches by
+		// one of `placedLocTypes` (on its location or a parent); with `placedRootPlugins`, its root location
+		// must also come from one of these plugins (Solstheim). Empty: off for this family.
+		std::vector<std::string> placedLocTypes;
+		std::vector<std::string> placedRootPlugins;
 	};
 
 	// A leveled list made at launch (no vanilla list gives Ancient Nord armor), named "@name" in a

@@ -275,6 +275,10 @@
 		// does, for its Ancient Nord weapons) are added to the era list that replaces them, so they
 		// stay in tombs. [] turns it off.
 		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
+		// Weapons and armor placed by hand in the base game (altars, tables, floors) in these places get a
+		// piece of the same kind from the era lists below when they load: the same each time, nothing in the
+		// save. Quest, owned and enchanted-by-hand pieces stay. Remove "placed" to turn it off.
+		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ] },
 
 		// Generic list -> era list. Only the entry's object changes: level and count stay.
 		"replace": [
@@ -464,6 +468,8 @@
 			"Dragonborn.esm|0x02AAC1"  // DLC2TreasDraugrChest (10 % special loot)
 		],
 		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
+		// Placed by hand in Solstheim's barrows (root location from Dragonborn.esm): tried before "nordic".
+		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ], "root_plugins": [ "Dragonborn.esm" ] },
 		"replace": [
 			// Gold: treasure of the same value, with stalhrim (see "ancient_treasure").
 			{ "to": "@solstheim_treasure", "from": [ "Skyrim.esm|0x088513", "Skyrim.esm|0x088512" ], "treasure": true },  // LootDraugrGoldBoss01, LootDraugrGold
@@ -610,6 +616,9 @@
 			"Dragonborn.esm|0x02AABC"  // DLC2TreasDwarvenChestSmall
 		],
 		"era_keywords": [ "WeapMaterialDwarven" ],
+		// Weapons and armor placed by hand in the base game (altars, tables, floors) in these places get a
+		// piece of the same kind from the era lists above when they load. Remove "placed" to turn it off.
+		"placed": { "loc_types": [ "LocTypeDwarvenAutomatons" ] },
 		"replace": [
 			// Gold: Dwarven metal and gems of the same value (see "ancient_treasure").
 			{ "to": "@dwemer_treasure", "from": [ "Skyrim.esm|0x101DAA" ], "treasure": true },   // LootDwarvenGoldBoss

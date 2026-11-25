@@ -25,6 +25,7 @@ namespace
 				Config config;
 				Step("Config", [&] { config = Config::Load(); });
 				Step("Swap", [&] { Swap::Apply(config); });
+				Swap::InstallPlaced();
 				if (config.survey != Config::Survey::kOff) {
 					Step("Survey", [&] { Survey::Run(config); });
 				}
