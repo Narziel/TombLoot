@@ -102,6 +102,12 @@
 			],
 			"fallback": "Skyrim.esm|0x0DDD62" // LItemDraugr02BossWeapon1HMagic
 		},
+		// Instead of the mage robes of the boss chest (LootEnchRobes10): an enchanted piece of the era, with
+		// the same chance (1 in 10). An enchanted Ancient Nord weapon, or armor with Ancient Nord Armoury.
+		"ancient_robes": { "chance_none": 90, "extends": "ancient_ench_armor", "items": [
+			"Skyrim.esm|0x0DDD62", // LItemDraugr02BossWeapon1HMagic
+			"Skyrim.esm|0x0DDD63"  // LItemDraugr02BossWeapon2HMagic
+		] },
 		// Solstheim: the same, plus Dragonborn's enchanted stalhrim at the ebony tier.
 		"solstheim_ench_weapon": { "extends": "ancient_ench_weapon", "items": [
 			{ "form": "Dragonborn.esm|0x037846", "level": 38 } // DLC2LItemEnchStalhrimWeaponAny75
@@ -285,6 +291,7 @@
 			{ "to": "@ancient_change", "from": [ "Skyrim.esm|0x037C2B" ], "treasure": true },    // LootGoldChange
 			{ "to": "@ancient_change25", "from": [ "Skyrim.esm|0x04F78D" ], "treasure": true },  // LootGoldChange25
 			{ "to": "@ancient_urn_change", "from": [ "Skyrim.esm|0x10FCFD" ], "treasure": true }, // LootUrnGoldChange (ruin urns)
+			{ "to": "@ancient_robes", "from": [ "Skyrim.esm|0x10F9B5" ] },                       // LootEnchRobes10 (mage robes of the boss chest)
 			{
 				"to": "Skyrim.esm|0x0242FC", // LItemDraugr02Weapon1H
 				"from": [
