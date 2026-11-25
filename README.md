@@ -1,6 +1,6 @@
 # TombLoot
 
-SKSE plugin for Skyrim Anniversary Edition: era-appropriate loot in ancient tombs. Nordic barrows give Ancient Nord gear instead of iron and steel, Solstheim's barrows add stalhrim, and Dwemer ruins give Dwarven gear. No ESP, no Papyrus script; everything is applied in memory at launch, after every other plugin and loot patch.
+SKSE plugin for Skyrim Anniversary Edition: era-appropriate loot in ancient tombs. Nordic barrows give Ancient Nord gear instead of iron and steel, Solstheim's barrows add stalhrim, and Dwemer ruins give Dwarven gear. No ESP, no Papyrus script; the lists are fixed in memory at launch, after every other plugin and loot patch, and gear placed by hand in tombs is swapped as it loads.
 
 Copyright (C) 2026 narziel.
 
@@ -14,6 +14,7 @@ At data load (and again at each game load), for each family of tombs (`nordic`, 
 4. **Era weapons in generic lists**: weapons carrying an era material keyword (`"era_keywords"`, `WeapMaterialDraugr`…) that a mod put in the replaced generic lists are added to a copy of the era list made at launch, so they are not lost in tombs. The era list itself, also carried by draugr, is not changed.
 5. **Treasure instead of septims**: the tombs' gold lists, the coins put straight in their chests and their loose change point to lists of ingots, ore and gems of the same average value, made at launch (`ancient_treasure`, `dwemer_treasure`…). `"treasure": false` turns it off; it is off by itself when a coin mod listed in `"treasure_unless"` (C.O.I.N.) is loaded.
 6. The original entries are kept and put back before each new application: a changed config applies cleanly, and removing the mod gives the old loot back.
+7. **Gear placed by hand** (`"placed"`): when a weapon or armor piece placed by a base game master loads in one of the family's places (by location type; Solstheim by its root location), its base object becomes an era piece of the same kind (weapon type or armor slot, enchanted or not), drawn from the era lists of the replacements that cover it, within the player's level. The choice depends on the reference, so it is stable; nothing is saved. Persistent, owned and separately enchanted references are skipped.
 
 A short report in `Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log` tells what each family's chests can give, and the path of any gear of the wrong era.
 

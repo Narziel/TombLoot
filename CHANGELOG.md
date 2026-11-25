@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.3.0
+
+- Gear laid out by hand: the iron helmet on a barrow altar, the gauntlets on the floor of a Dwemer ruin. Weapons and armor placed by Bethesda (Skyrim, Update, Dawnguard, HearthFires, Dragonborn) in Nordic barrows, dragon priest lairs, Solstheim's barrows and Dwemer ruins become an era piece of the same kind as they load, through the family's replacements: a helmet for a helmet, a sword for a sword, enchanted only if the original was, within the player's level. The piece depends on the object, so it is the same every time; nothing goes in the save, and removing TombLoot brings the original back. Persistent (quest) objects, owned objects and pieces enchanted on their own are left alone, and so are pieces with no era equivalent of their kind. `"placed"` in each family of the config; remove it to turn it off.
+- Nordic boss chests: their 10 % chance of an enchanted mage robe (`LootEnchRobes10`) now gives an enchanted piece of the era instead (`@ancient_robes`).
+- Addresses checked against SE 1.5.97 and AE 1.6.353 to 1.6.1179 and the 2026 update (1.7.99).
+
 ## 1.2.2
 
 - Ruin urns: their loose change (1 to 9 septims, in `LootUrnSmallTreasure30`) becomes silver ore of the same average value. Swapped only inside the urn list: the same gold list stays in burnt corpses and spider cocoons.
