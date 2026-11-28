@@ -137,7 +137,7 @@ TombLoot is part of a small family of mods for a world that makes sense. Each on
 [list]
 [*][url=https://www.nexusmods.com/skyrimspecialedition/mods/196605]Every Crumb Counts[/url] — food is scarce: hunt, cook or buy.
 [*][url=https://www.nexusmods.com/skyrimspecialedition/mods/200034]Every Coin Counts[/url] — gold that makes sense: beasts carry no purse, gold follows rank.
-[*][color=#e6a84a][b]BannerLoot[/b][/color] [À COMPLÉTER : lien Nexus de BannerLoot] — every banner keeps its own: the chests of the living factions hold their own gear.
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/200933]BannerLoot[/url] — every banner keeps its own: the chests of the living factions hold their own gear.
 [/list]
 
 [center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/series.png[/img][/center]
