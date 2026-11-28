@@ -22,6 +22,7 @@ IMAGES
 ---------------------------------------------------------------------
 - art/banner.png (1920x480) : image d'en-tête de la page (Header image).
 - art/key.png (1920x1080) : image principale (Primary image), vignette dans les listes et première image de la galerie.
+- G:/Skyrim/BannerLoot/art/series.png (1920x1080) : la famille de mods, deuxième image de la galerie.
 Si Nexus demande une autre taille pour l'en-tête au téléversement, art/render.ps1 régénère les images (taille dans le script).
 Conseillé, pas obligatoire : 2 ou 3 captures en jeu dans la galerie (coffre de crypte ouvert, coffre de boss, ruine dwemer).
 
@@ -29,6 +30,8 @@ Conseillé, pas obligatoire : 2 ou 3 captures en jeu dans la galerie (coffre de 
 ---------------------------------------------------------------------
 DESCRIPTION (champ principal, BBCode)
 ---------------------------------------------------------------------
+
+[center][img]https://raw.githubusercontent.com/Narziel/TombLoot/main/art/banner.png[/img][/center]
 
 [center][size=6][color=#e6b65c][b]TombLoot[/b][/color][/size]
 [size=4][i][color=#bfe3ea]Ancient tombs. Ancient loot.[/color][/i][/size][/center]
@@ -50,11 +53,11 @@ In Skyrim, a barrow sealed for three thousand years draws its treasure from the 
 [b]TombLoot[/b] gives the tombs their history back. The dead keep what they were buried with.
 
 [list]
-[*][color=#bfe3ea][b]Nordic barrows[/b][/color] — Ancient Nord blades and honed steel, Ancient Nord armor, draugr arrows, and the frost-enchanted weapons of the draugr lords. The great boss chests hold the finest pieces of the age.
-[*][color=#bfe3ea][b]The barrows of Solstheim[/b][/color] — The same ancient gear, and at high level, [b]stalhrim[/b]: the enchanted ice that only the ancient Nords of Solstheim knew how to work. You will find it there, and nowhere else.
-[*][color=#bfe3ea][b]Dwemer ruins[/b][/color] — Dwarven weapons, Dwarven armor, enchanted Dwarven gear, in Skyrim and on Solstheim. The Deep Folk did not forge steel shields.
-[*][color=#bfe3ea][b]Treasure, not septims[/b][/color] — The Septim coin was struck in the Second Era, long after these tombs were sealed. Their gold becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the [b]same value[/b], at the same levels. Worth as much, but you have to sell it. Prefer septims? One line in the config turns it off. With C.O.I.N., it steps aside by itself and leaves the tombs to its ancient coins.
-[*][color=#bfe3ea][b]The highest levels[/b][/color] — Ebony comes at level 38, as Bethesda intended. With Open World Loot or MorrowLoot Ultimate, which ban random ebony, it stays out by itself.
+[*][color=#e6a84a][b]Nordic barrows[/b][/color] — Ancient Nord blades and honed steel, Ancient Nord armor, draugr arrows, and the frost-enchanted weapons of the draugr lords. The great boss chests hold the finest pieces of the age.
+[*][color=#e6a84a][b]The barrows of Solstheim[/b][/color] — The same ancient gear, and at high level, [b]stalhrim[/b]: the enchanted ice that only the ancient Nords of Solstheim knew how to work. You will find it there, and nowhere else.
+[*][color=#e6a84a][b]Dwemer ruins[/b][/color] — Dwarven weapons, Dwarven armor, enchanted Dwarven gear, in Skyrim and on Solstheim. The Deep Folk did not forge steel shields.
+[*][color=#e6a84a][b]Treasure, not septims[/b][/color] — The Septim coin was struck in the Second Era, long after these tombs were sealed. Their gold becomes silver and gold ingots, ore and gems (Dwarven metal in the ruins) of the [color=#e6a84a][b]same value[/b][/color], at the same levels. Worth as much, but you have to sell it. Prefer septims? One line in the config turns it off. With C.O.I.N., it steps aside by itself and leaves the tombs to its ancient coins.
+[*][color=#e6a84a][b]The highest levels[/b][/color] — [color=#e6a84a][b]Ebony comes at level 38[/b][/color], as Bethesda intended. With Open World Loot or MorrowLoot Ultimate, which ban random ebony, it stays out by itself.
 [/list]
 
 [size=4][color=#e6b65c][b]New in 1.3: what lies on the altars[/b][/color][/size]
@@ -69,7 +72,7 @@ Dungeon mods lay out their own gear too: a steel helmet by a sarcophagus, an iro
 
 The septims scattered on a barrow altar and the coin purse beside a skeleton are now treasure of the same value: silver ore for a few coins, a silver ring or gold ore for a purse, a gold necklace, a ruby or a gem-set ring for a real hoard, Dwemer metal and cogs in the ruins. A single stray coin is usually gone: one septim is not worth a nugget.
 
-Only the [i]object[/i] of each loot entry changes. Levels, quantities and chances stay exactly as your load order set them: [b]not more loot, not less, only loot of the right age.[/b]
+Only the [i]object[/i] of each loot entry changes. Levels, quantities and chances stay exactly as your load order set them: [color=#e6a84a][b]not more loot, not less, only loot of the right age.[/b][/color]
 
 [line]
 
@@ -77,15 +80,15 @@ Only the [i]object[/i] of each loot entry changes. Levels, quantities and chance
 
 You installed a loot overhaul. It cleaned the tomb lists. Then your Bashed Patch, your Synthesis patch or a new armor mod merged the lists again, and quietly brought the iron back. You never knew why.
 
-TombLoot does not live in a plugin. It works [b]at launch, in memory, after every plugin and every patch[/b], and fixes the tomb lists as your game really sees them. Whatever you add to your load order, what TombLoot fixes stays fixed.
+TombLoot does not live in a plugin. It works [color=#e6a84a][b]at launch, in memory, after every plugin and every patch[/b][/color], and fixes the tomb lists as your game really sees them. Whatever you add to your load order, what TombLoot fixes stays fixed.
 
 [list]
-[*][b]It finds the tomb chests by itself[/b] — every chest that holds a tomb list, including unique boss chests and the barrows added by other mods.
-[*][b]It finds the mod sub-lists by itself[/b] — a sub-list that a weapon mod uses only in tombs is fixed too. A list also used by bandits, merchants or NPC outfits is never touched.
-[*][b]It keeps your mods' ancient weapons[/b] — a weapon mod that puts its Ancient Nord or Dwarven weapons in the common lists (Reforging does) still sees them in tombs: TombLoot recognizes them by their material and carries them over.
-[*][b]It never breaks on a missing mod[/b] — every form from a plugin you do not have is simply skipped.
-[*][b]It tells you what it did[/b] — a short report in the log says what tomb chests can give, and where any gear of the wrong age still comes from.
-[*][b]It costs nothing[/b] — about 10 milliseconds at launch, and a quick check when an object loads in a tomb. No script, no event, nothing in your save.
+[*][color=#e6a84a][b]It finds the tomb chests by itself[/b][/color] — every chest that holds a tomb list, including unique boss chests and the barrows added by other mods.
+[*][color=#e6a84a][b]It finds the mod sub-lists by itself[/b][/color] — a sub-list that a weapon mod uses only in tombs is fixed too. A list also used by bandits, merchants or NPC outfits is never touched.
+[*][color=#e6a84a][b]It keeps your mods' ancient weapons[/b][/color] — a weapon mod that puts its Ancient Nord or Dwarven weapons in the common lists (Reforging does) still sees them in tombs: TombLoot recognizes them by their material and carries them over.
+[*][color=#e6a84a][b]It never breaks on a missing mod[/b][/color] — every form from a plugin you do not have is simply skipped.
+[*][color=#e6a84a][b]It tells you what it did[/b][/color] — a short report in the log says what tomb chests can give, and where any gear of the wrong age still comes from.
+[*][color=#e6a84a][b]It costs nothing[/b][/color] — about 10 milliseconds at launch, and a quick check when an object loads in a tomb. No script, no event, nothing in your save.
 [/list]
 
 [line]
@@ -104,16 +107,16 @@ TombLoot does not live in a plugin. It works [b]at launch, in memory, after ever
 [size=5][color=#e6b65c][b]Plays well with[/b][/color][/size]
 
 [list]
-[*][b]Open World Loot[/b] — tested. TombLoot puts back the Dwarven-only and Ancient Nord loot that a Bashed Patch removes, and keeps random ebony out.
-[*][b]MorrowLoot Ultimate[/b] — compatible. Its Ancient Nord Hero shield appears at level 21, random ebony stays out.
-[*][b]Ancient Nord Armoury EXTREME[/b] — recommended, tested. Its ancient pieces and enchanted pieces fill the tombs; its Nordic carved and iron entries are left out of the tombs.
-[*][b]Dragon Cult Weapons[/b] — tested. Its draugr sub-lists are fixed, its cult weapons stay.
-[*][b]DynamicContainerLoot[/b] — tested. TombLoot runs after it.
-[*][b]C.O.I.N.[/b] — tested. Its ancient coins already replace tomb septims, so TombLoot leaves the gold to it and only changes the gear.
-[*][b]Roleplaying in Skyrim - Loot Overhaul[/b] — tested. Era gear works and its tomb gold becomes treasure too. Its enchanted Dwarven and stalhrim lists mix materials by rarity, so an odd glass or ebony piece can still show up.
-[*][b]Bashed Patch, Synthesis, Wrye Bash merges[/b] — this is exactly what TombLoot was made for.
-[*][b]Weapon and armor mods[/b] — their items stay everywhere in the world, except in ancient tombs.
-[*][b]Dungeon and barrow mods[/b] — covered when they reuse the vanilla tomb lists; otherwise their lists can be added to the config in one line.
+[*][color=#e6a84a][b]Open World Loot[/b][/color] — tested. TombLoot puts back the Dwarven-only and Ancient Nord loot that a Bashed Patch removes, and keeps random ebony out.
+[*][color=#e6a84a][b]MorrowLoot Ultimate[/b][/color] — compatible. Its Ancient Nord Hero shield appears at level 21, random ebony stays out.
+[*][color=#e6a84a][b]Ancient Nord Armoury EXTREME[/b][/color] — recommended, tested. Its ancient pieces and enchanted pieces fill the tombs; its Nordic carved and iron entries are left out of the tombs.
+[*][color=#e6a84a][b]Dragon Cult Weapons[/b][/color] — tested. Its draugr sub-lists are fixed, its cult weapons stay.
+[*][color=#e6a84a][b]DynamicContainerLoot[/b][/color] — tested. TombLoot runs after it.
+[*][color=#e6a84a][b]C.O.I.N.[/b][/color] — tested. Its ancient coins already replace tomb septims, so TombLoot leaves the gold to it and only changes the gear.
+[*][color=#e6a84a][b]Roleplaying in Skyrim - Loot Overhaul[/b][/color] — tested. Era gear works and its tomb gold becomes treasure too. Its enchanted Dwarven and stalhrim lists mix materials by rarity, so an odd glass or ebony piece can still show up.
+[*][color=#e6a84a][b]Bashed Patch, Synthesis, Wrye Bash merges[/b][/color] — this is exactly what TombLoot was made for.
+[*][color=#e6a84a][b]Weapon and armor mods[/b][/color] — their items stay everywhere in the world, except in ancient tombs.
+[*][color=#e6a84a][b]Dungeon and barrow mods[/b][/color] — covered when they reuse the vanilla tomb lists; otherwise their lists can be added to the config in one line.
 [/list]
 
 [line]
@@ -123,8 +126,8 @@ TombLoot does not live in a plugin. It works [b]at launch, in memory, after ever
 Skyrim fills a chest the first time its area loads, then keeps it until the area resets.
 
 [list]
-[*][b]Installed mid-game:[/b] the tombs you have not visited yet are fixed at once; the others when they reset.
-[*][b]Removed:[/b] nothing is stored in your save. Chests already filled keep their items; tombs give vanilla loot again when they reset.
+[*][color=#e6a84a][b]Installed mid-game:[/b][/color] the tombs you have not visited yet are fixed at once; the others when they reset.
+[*][color=#e6a84a][b]Removed:[/b][/color] nothing is stored in your save. Chests already filled keep their items; tombs give vanilla loot again when they reset.
 [/list]
 
 [line]
@@ -134,6 +137,20 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 [b]Config:[/b] [font=Courier New]Data/SKSE/Plugins/TombLoot/TombLoot.json[/font], fully commented. Add the lists and chests of your own mods, add ancient pieces from an armor mod, or switch the report to "full" or "off". It is read again at every game load.
 
 [b]Log:[/b] [font=Courier New]Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log[/font]. Found an iron sword in a barrow? The [b][Summary][/b] lines name the chest and the list that brought it. Post them in a comment and it will be fixed.
+
+[line]
+
+[size=5][color=#e6b65c][b]The family[/b][/color][/size]
+
+TombLoot is part of a small family of mods for a world that makes sense. Each one stands alone; together, Skyrim makes sense.
+
+[list]
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/196605]Every Crumb Counts[/url] — food is scarce: hunt, cook or buy.
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/200034]Every Coin Counts[/url] — gold that makes sense: beasts carry no purse, gold follows rank.
+[*][color=#e6a84a][b]BannerLoot[/b][/color] [À COMPLÉTER : lien Nexus de BannerLoot] — every banner keeps its own: the chests of the living factions hold their own gear.
+[/list]
+
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/series.png[/img][/center]
 
 [line]
 
@@ -147,8 +164,8 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 [size=4][color=#e6b65c][b]Game version[/b][/color][/size]
 
 [list]
-[*][b]Tested:[/b] Skyrim Anniversary Edition 1.6.1170 (Steam).
-[*][b]Skyrim SE 1.5.97 and the 2026 update (1.7.x):[/b] built for them through Address Library, and every address the plugin uses is in their databases, but not tested in game yet. If you play one of them, please say in the comments whether it works: the log file says whether TombLoot loaded.
+[*][color=#e6a84a][b]Tested:[/b][/color] Skyrim Anniversary Edition 1.6.1170 (Steam).
+[*][color=#e6a84a][b]Skyrim SE 1.5.97 and the 2026 update (1.7.x):[/b][/color] built for them through Address Library, and every address the plugin uses is in their databases, but not tested in game yet. If you play one of them, please say in the comments whether it works: the log file says whether TombLoot loaded.
 [*]No VR.
 [/list]
 
