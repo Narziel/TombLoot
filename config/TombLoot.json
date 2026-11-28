@@ -280,7 +280,32 @@
 		// save. Quest, owned and enchanted-by-hand pieces stay. A piece placed by a mod, or defined by one,
 		// gets a base game era piece of the same kind, never of a higher material (iron or steel -> Ancient
 		// Nord); enchanted pieces, artifacts and pieces of unknown material stay. Remove "placed" to turn it off.
-		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ] },
+		// "coins": septims placed by hand (by anyone) become treasure, with "treasure" only. The highest tier
+		// the pile reaches ("min" coins) gives one of its items, chosen by the reference, as many as the pile is
+		// worth (item value from the game); the remainder gives one more by chance, so 12 septims give a silver
+		// ore 1 in 2. Only the items the pile is worth are chosen (32 septims: not a gold ore at 50). A pile that
+		// gives nothing is hidden. Coin purses (flora that gives septims) count their drawn gold.
+		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ], "coins": [
+			{ "min": 1, "items": [ "Skyrim.esm|0x05ACDF" ] },  // silver ore (25)
+			{ "min": 25, "items": [
+				"Skyrim.esm|0x05ACDF",  // silver ore (25)
+				"Skyrim.esm|0x03B97C",  // silver ring (30)
+				"Skyrim.esm|0x05ACDE",  // gold ore (50)
+				"Skyrim.esm|0x05ACE3",  // silver ingot (50)
+				"Skyrim.esm|0x09171B",  // silver necklace (60)
+				"Skyrim.esm|0x01CF2B"   // gold ring (75)
+			] },
+			{ "min": 100, "items": [
+				"Skyrim.esm|0x05AD9E",  // gold ingot (100)
+				"Skyrim.esm|0x063B45",  // garnet (100)
+				"Skyrim.esm|0x0877D5",  // gold necklace (120)
+				"Skyrim.esm|0x063B46",  // amethyst (120)
+				"Skyrim.esm|0x0877AB",  // silver garnet ring (160)
+				"Skyrim.esm|0x0877A7",  // silver amethyst ring (180)
+				"Skyrim.esm|0x063B42",  // ruby (200)
+				"Skyrim.esm|0x0877B1"   // silver ruby ring (260)
+			] }
+		] },
 
 		// Generic list -> era list. Only the entry's object changes: level and count stay.
 		"replace": [
@@ -471,7 +496,14 @@
 		],
 		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
 		// Placed by hand in Solstheim's barrows (root location from Dragonborn.esm): tried before "nordic".
-		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ], "root_plugins": [ "Dragonborn.esm" ] },
+		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ], "root_plugins": [ "Dragonborn.esm" ], "coins": [
+			// The same as "nordic", and stalhrim (200) among the largest piles.
+			{ "min": 1, "items": [ "Skyrim.esm|0x05ACDF" ] },
+			{ "min": 25, "items": [ "Skyrim.esm|0x05ACDF", "Skyrim.esm|0x03B97C", "Skyrim.esm|0x05ACDE", "Skyrim.esm|0x05ACE3",
+				"Skyrim.esm|0x09171B", "Skyrim.esm|0x01CF2B" ] },
+			{ "min": 100, "items": [ "Skyrim.esm|0x05AD9E", "Skyrim.esm|0x063B45", "Skyrim.esm|0x0877D5", "Skyrim.esm|0x063B46",
+				"Skyrim.esm|0x0877AB", "Skyrim.esm|0x0877A7", "Skyrim.esm|0x063B42", "Skyrim.esm|0x0877B1", "Dragonborn.esm|0x02B06B" ] }
+		] },
 		"replace": [
 			// Gold: treasure of the same value, with stalhrim (see "ancient_treasure").
 			{ "to": "@solstheim_treasure", "from": [ "Skyrim.esm|0x088513", "Skyrim.esm|0x088512" ], "treasure": true },  // LootDraugrGoldBoss01, LootDraugrGold
@@ -620,7 +652,12 @@
 		"era_keywords": [ "WeapMaterialDwarven" ],
 		// Weapons and armor placed by hand in the base game (altars, tables, floors) in these places get a
 		// piece of the same kind from the era lists above when they load. Remove "placed" to turn it off.
-		"placed": { "loc_types": [ "LocTypeDwarvenAutomatons" ] },
+		// Septims placed by hand: Dwemer metal and gems of the same value (see "coins" in "nordic").
+		"placed": { "loc_types": [ "LocTypeDwarvenAutomatons" ], "coins": [
+			{ "min": 1, "items": [ "Skyrim.esm|0x0AEBF1" ] },                                               // Dwemer cog (5)
+			{ "min": 25, "items": [ "Skyrim.esm|0x0C886A", "Skyrim.esm|0x0DB8A2" ] },                       // Dwarven scrap metal (15), Dwarven metal ingot (30)
+			{ "min": 100, "items": [ "Skyrim.esm|0x0DB8A2", "Skyrim.esm|0x063B45", "Skyrim.esm|0x063B46", "Skyrim.esm|0x063B42" ] }  // Dwarven metal ingot, garnet, amethyst, ruby
+		] },
 		"replace": [
 			// Gold: Dwarven metal and gems of the same value (see "ancient_treasure").
 			{ "to": "@dwemer_treasure", "from": [ "Skyrim.esm|0x101DAA" ], "treasure": true },   // LootDwarvenGoldBoss

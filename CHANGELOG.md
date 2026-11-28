@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.4.1
+
+- Septims placed by hand and coin purses in tombs (by Bethesda or a mod): a pile on an altar, coins on the floor, the purse by a skeleton become treasure of the same value as they load. The pile's size picks a tier (1 to 24 septims: silver ore; 25 to 99: silver ore, gold ore, silver ingot, silver and gold rings, silver necklace; 100 and more: gold ingot, gems, gold necklace, gem-set silver rings; stalhrim too on Solstheim; Dwemer cogs, scrap metal, ingots and gems in Dwemer ruins), the reference picks one treasure the pile is worth, as many as its value allows, the remainder one more by chance. A pile that gives nothing is hidden. The same every time, nothing in the save. A purse's gold is drawn from its own list; purses already taken are left alone. Owned and quest coins stay. `"coins"` in each family's `"placed"`; off with `"treasure": false` or when C.O.I.N. is loaded.
+
 ## 1.4.0
 
 - Gear placed by other mods: a weapon or armor piece placed by hand by a mod's dungeon (or one defined by a mod and placed anywhere) in Nordic barrows, dragon priest lairs, Solstheim's barrows and Dwemer ruins becomes a base game era piece of the same kind (weapon type or armor slot), never of a higher material: iron and steel become Ancient Nord, and in Dwemer ruins only Dwarven gear or better becomes Dwarven. Always a Skyrim, Update or DLC piece, since a mod's ground model can sit badly on a rack. Enchanted pieces, artifacts, pieces already of the era (`"ancient_plugins"`, `"ancient_items"`, era keywords and the era lists' own pieces) and pieces of unknown material stay, and so do pieces with no base game era equivalent of their kind (maces and daggers in barrows).

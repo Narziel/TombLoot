@@ -30,6 +30,15 @@ struct Config
 		// must also come from one of these plugins (Solstheim). Empty: off for this family.
 		std::vector<std::string> placedLocTypes;
 		std::vector<std::string> placedRootPlugins;
+		// Septims placed by hand in these places, with the treasure replacements only: a pile of at least `min`
+		// coins (the highest tier reached) becomes one of the tier's items, as many as its value allows. Empty:
+		// they stay.
+		struct CoinTier
+		{
+			int                      min{ 1 };
+			std::vector<std::string> items;
+		};
+		std::vector<CoinTier> placedCoins;
 	};
 
 	// A leveled list made at launch (no vanilla list gives Ancient Nord armor), named "@name" in a

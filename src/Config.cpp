@@ -35,6 +35,13 @@ namespace
 		if (auto placed = it->find("placed"); placed != it->end() && placed->is_object()) {
 			family.placedLocTypes = Strings(*placed, "loc_types");
 			family.placedRootPlugins = Strings(*placed, "root_plugins");
+			if (auto coins = placed->find("coins"); coins != placed->end() && coins->is_array()) {
+				for (const auto& tier : *coins) {
+					if (tier.is_object()) {
+						family.placedCoins.push_back({ tier.value("min", 1), Strings(tier, "items") });
+					}
+				}
+			}
 		}
 		if (auto rep = it->find("replace"); rep != it->end() && rep->is_array()) {
 			for (const auto& r : *rep) {

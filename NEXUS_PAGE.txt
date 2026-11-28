@@ -65,6 +65,10 @@ The iron helmet resting on a barrow altar, the steel gauntlets on the floor of a
 
 Dungeon mods lay out their own gear too: a steel helmet by a sarcophagus, an iron axe beside a skeleton. In a barrow or a Dwemer ruin, it now becomes a piece of the era from the base game, never better than what lay there: iron and steel become Ancient Nord. Enchanted pieces and artifacts stay, and so does anything with no ancient equivalent (a mace, a dagger).
 
+[size=4][color=#e6b65c][b]New in 1.4.1: the coins on the altar[/b][/color][/size]
+
+The septims scattered on a barrow altar and the coin purse beside a skeleton are now treasure of the same value: silver ore for a few coins, a silver ring or gold ore for a purse, a gold necklace, a ruby or a gem-set ring for a real hoard, Dwemer metal and cogs in the ruins. A single stray coin is usually gone: one septim is not worth a nugget.
+
 Only the [i]object[/i] of each loot entry changes. Levels, quantities and chances stay exactly as your load order set them: [b]not more loot, not less, only loot of the right age.[/b]
 
 [line]
@@ -150,7 +154,7 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
 
-TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.4.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
+TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.4.1). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
 
 [center][i][color=#9fb8bd]May the dead keep their own.[/color][/i][/center]
 
@@ -236,6 +240,9 @@ TombLoot is released under the GNU General Public License v3 or later. You may u
 ---------------------------------------------------------------------
 ONGLET « Logs » (changelog, une ligne par point)
 ---------------------------------------------------------------------
+
+1.4.1
+- Septims placed by hand and coin purses in barrows and Dwemer ruins become treasure of the same value (ore, ingots, rings, necklaces, gems; Dwemer metal in the ruins). A single stray coin is usually gone.
 
 1.4.0
 - Gear laid out by other mods in barrows and Dwemer ruins becomes a base game piece of the era, never of a better material (iron and steel become Ancient Nord); enchanted pieces, artifacts and pieces with no ancient equivalent stay.

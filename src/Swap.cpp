@@ -412,10 +412,18 @@ namespace Swap
 			std::unordered_set<RE::TESForm*> eraPieces;
 			std::vector<RE::BGSKeyword*>     eraKeywords;
 			std::vector<Vanilla>             vanilla;
+			// Septims placed by hand: tiers by rising pile size, each with its treasures and their value.
+			struct CoinTier
+			{
+				int                                              min;
+				std::vector<std::pair<RE::TESBoundObject*, int>> items;
+			};
+			std::vector<CoinTier> coins;
 		};
 		std::vector<PlacedFamily> placedFamilies;  // families with a root plugin come first (Solstheim before Skyrim)
 		std::shared_mutex         placedLock;      // the hook reads on the loading threads; Apply writes
 		std::atomic<std::uint32_t> placedSwapped{ 0 };
+		RE::TESForm*               septim{ nullptr };  // Gold001
 
 		// Rank of a material keyword: a piece placed by a mod never becomes an era piece of a higher rank.
 		std::unordered_map<RE::BGSKeyword*, int> materialRanks;
@@ -779,10 +787,121 @@ namespace Swap
 		// era piece of the same kind, chosen by its reference (the same each time, nothing in the save; without
 		// TombLoot it comes back). A piece placed by a mod, or defined by one, goes through ModPick. A leveled base
 		// (XLIB) is drawn here, then judged like a piece placed as is; the XLIB is dropped so the engine keeps it.
+		// Septims placed by hand in a tomb (a pile on an altar, coins on the floor), by Bethesda or a mod: the
+		// highest tier the pile reaches gives one treasure, chosen by the reference, as many as the pile is worth;
+		// the remainder gives one more by chance (12 septims: a silver ore 1 in 2). Nothing: the pile is hidden
+		// (in memory only, not in the save).
+		// Septims a form gives (Gold001 or a leveled list of gold, drawn as the engine does: chance none, use all,
+		// count), seeded by the reference.
+		int DrawSeptims(RE::TESForm* a_form, std::uint16_t a_level, std::uint64_t& a_seed, int a_depth = 0)
+		{
+			if (a_form == septim) {
+				return 1;
+			}
+			auto* list = a_form ? a_form->As<RE::TESLevItem>() : nullptr;
+			if (!list || a_depth > 16) {
+				return 0;
+			}
+			if (list->chanceNone > 0 && static_cast<int>(NextSeed(a_seed) % 100) < list->chanceNone) {
+				return 0;
+			}
+			std::vector<const RE::LEVELED_OBJECT*> eligible;
+			std::uint16_t                          top = 0;
+			for (const auto& entry : list->entries) {
+				if (entry.form && entry.level <= a_level) {
+					eligible.push_back(&entry);
+					top = (std::max)(top, entry.level);
+				}
+			}
+			if (!(list->llFlags & RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel)) {
+				std::erase_if(eligible, [&](const auto* a_e) { return a_e->level != top; });
+			}
+			if (eligible.empty()) {
+				return 0;
+			}
+			int total = 0;
+			if (list->llFlags & RE::TESLeveledList::kUseAll) {
+				for (const auto* entry : eligible) {
+					total += entry->count * DrawSeptims(entry->form, a_level, a_seed, a_depth + 1);
+				}
+			} else {
+				const auto* entry = eligible[static_cast<std::size_t>(NextSeed(a_seed) % eligible.size())];
+				total = entry->count * DrawSeptims(entry->form, a_level, a_seed, a_depth + 1);
+			}
+			return total;
+		}
+
+		// A coin purse (flora whose harvest is gold: CoinPurseSmall, Medium, Large).
+		std::unordered_set<RE::TESForm*> coinFlora;
+
+		bool GivesSeptims(RE::TESForm* a_form, int a_depth = 0)
+		{
+			if (a_form == septim) {
+				return true;
+			}
+			auto* list = a_form ? a_form->As<RE::TESLevItem>() : nullptr;
+			return list && a_depth <= 16 && std::ranges::any_of(list->entries, [&](const auto& a_e) { return GivesSeptims(a_e.form, a_depth + 1); });
+		}
+
+		void SwapCoins(RE::TESObjectREFR* a_ref, const RE::BGSLocation* a_location, bool a_purse)
+		{
+			const auto family = std::ranges::find_if(placedFamilies, [&](const auto& a_f) { return !a_f.coins.empty() && PlaceMatches(a_f, a_location); });
+			if (family == placedFamilies.end()) {
+				return;
+			}
+			std::uint64_t seed = a_ref->GetFormID() ^ 0xC01A5EEDULL;
+			int           coins = (std::max)(static_cast<int>(a_ref->extraList.GetCount()), 1);
+			if (a_purse) {
+				if (a_ref->formFlags & RE::TESObjectREFR::RecordFlags::kHarvested) {
+					return;  // already taken
+				}
+				const auto* player = RE::PlayerCharacter::GetSingleton();
+				const auto  level = static_cast<std::uint16_t>((std::max)(player ? static_cast<int>(player->GetLevel()) : 1, 1));
+				coins = DrawSeptims(a_ref->GetBaseObject()->As<RE::TESFlora>()->produceItem, level, seed);
+			}
+			const auto  tier = std::ranges::find_if(family->coins | std::views::reverse, [&](const auto& a_t) { return a_t.min <= coins; });
+			const char* what = a_purse ? " (purse)" : "";
+			if (tier == (family->coins | std::views::reverse).end() && !a_purse) {
+				return;  // fewer coins than the first tier
+			}
+			int                 count = 0;
+			RE::TESBoundObject* item = nullptr;
+			if (tier != (family->coins | std::views::reverse).end()) {
+				// Only the tier's treasures the pile is worth (32 septims: not a gold ore at 50); none: the cheapest.
+				std::vector<const std::pair<RE::TESBoundObject*, int>*> affordable;
+				for (const auto& candidate : tier->items) {
+					if (candidate.second <= coins) {
+						affordable.push_back(&candidate);
+					}
+				}
+				if (affordable.empty()) {
+					affordable.push_back(&*std::ranges::min_element(tier->items, {}, &std::pair<RE::TESBoundObject*, int>::second));
+				}
+				const auto& pick = *affordable[static_cast<std::size_t>(NextSeed(seed) % affordable.size())];
+				item = pick.first;
+				count = coins / pick.second;
+				if (static_cast<int>(NextSeed(seed) % static_cast<std::uint64_t>(pick.second)) < coins % pick.second) {
+					++count;
+				}
+			}
+			if (count == 0) {
+				a_ref->formFlags |= RE::TESForm::RecordFlags::kDisabled;
+				logger::info("[Placed] {} septims{}: nothing (hidden) | ref 0x{:08X} | {}", coins, what, a_ref->GetFormID(), PlaceName(a_location));
+			} else {
+				a_ref->SetObjectReference(item);
+				a_ref->extraList.SetCount(static_cast<std::uint16_t>((std::min)(count, 0xFFFF)));
+				logger::info("[Placed] {} septims{}: {} x{} | ref 0x{:08X} | {}", coins, what, Forms::Named(item), count, a_ref->GetFormID(),
+					PlaceName(a_location));
+			}
+			placedSwapped.fetch_add(1);
+		}
+
 		void SwapPlaced(RE::TESObjectREFR* a_ref)
 		{
-			auto* base = a_ref ? a_ref->GetBaseObject() : nullptr;
-			if (!base || !(base->Is(RE::FormType::Weapon) || base->Is(RE::FormType::Armor)) || a_ref->IsPersistent() || a_ref->IsDynamicForm()) {
+			auto*      base = a_ref ? a_ref->GetBaseObject() : nullptr;
+			const bool coin = base && base == septim;
+			const bool purse = base && !coin && coinFlora.contains(base);
+			if (!base || !(coin || purse || base->Is(RE::FormType::Weapon) || base->Is(RE::FormType::Armor)) || a_ref->IsPersistent() || a_ref->IsDynamicForm()) {
 				return;
 			}
 			if (!a_ref->GetFile(0)) {
@@ -802,6 +921,10 @@ namespace Swap
 			}
 			std::shared_lock lock{ placedLock };
 			if (std::ranges::none_of(placedFamilies, [&](const auto& a_f) { return PlaceMatches(a_f, location); })) {
+				return;
+			}
+			if (coin || purse) {
+				SwapCoins(a_ref, location, purse);
 				return;
 			}
 			auto* xlib = static_cast<ExtraLeveledItemBase*>(a_ref->extraList.GetByType(RE::ExtraDataType::kLeveledItemBase));
@@ -841,10 +964,10 @@ namespace Swap
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
 
-		// The family's generic pieces and the era lists they go to (gear only: gold and treasure are not placed).
+		// The family's generic pieces and the era lists they go to, and its coin list for septims placed by hand.
 		void RecordPlaced(const std::string& a_name, const Config::Family& a_family,
 			const std::vector<std::pair<RE::TESLevItem*, std::vector<RE::TESForm*>>>& a_bySource,
-			const std::unordered_map<RE::TESForm*, RE::TESLevItem*>& a_table, const std::vector<RE::BGSKeyword*>& a_eraKeywords)
+			const std::unordered_map<RE::TESForm*, RE::TESLevItem*>& a_table, const std::vector<RE::BGSKeyword*>& a_eraKeywords, bool a_treasure)
 		{
 			if (a_family.placedLocTypes.empty()) {
 				return;
@@ -853,6 +976,28 @@ namespace Swap
 			family.name = a_name;
 			family.locTypes = a_family.placedLocTypes;
 			family.rootPlugins = a_family.placedRootPlugins;
+			if (a_treasure) {
+				for (const auto& spec : a_family.placedCoins) {
+					PlacedFamily::CoinTier tier{ (std::max)(spec.min, 1), {} };
+					std::string            text;
+					for (const auto& ref : spec.items) {
+						auto* form = Forms::Resolve(ref);
+						auto* item = form ? form->As<RE::TESBoundObject>() : nullptr;
+						const auto* valued = form ? form->As<RE::TESValueForm>() : nullptr;
+						if (!item || !valued || valued->value <= 0) {
+							logger::debug("[Placed] {}: coin treasure {} not loaded or worth nothing, skipped", a_name, ref);
+							continue;
+						}
+						tier.items.emplace_back(item, valued->value);
+						text += (text.empty() ? "" : ", ") + Forms::Named(item) + " (" + std::to_string(valued->value) + ")";
+					}
+					if (!tier.items.empty()) {
+						logger::info("[Placed] {}: septims placed by hand, piles of {}+: {}", a_name, tier.min, text);
+						family.coins.push_back(std::move(tier));
+					}
+				}
+				std::ranges::sort(family.coins, {}, &PlacedFamily::CoinTier::min);
+			}
 			for (const auto& [toList, sources] : a_bySource) {
 				for (auto* source : sources) {
 					auto* target = a_table.at(source);
@@ -949,7 +1094,7 @@ namespace Swap
 				}
 			}
 
-			RecordPlaced(a_name, a_family, bySource, table, keywords);
+			RecordPlaced(a_name, a_family, bySource, table, keywords, a_treasure);
 
 			// 1. The family's lists: the configured ones.
 			std::vector<RE::TESLevItem*>        lists;
@@ -1059,6 +1204,14 @@ namespace Swap
 	{
 		std::unique_lock lock{ placedLock };  // the placed pieces' hook waits while lists change
 		placedFamilies.clear();
+		septim = RE::TESForm::LookupByID(0x00000F);  // Gold001
+		coinFlora.clear();
+		for (auto* flora : RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESFlora>()) {
+			if (flora && GivesSeptims(flora->produceItem)) {
+				coinFlora.insert(flora);
+			}
+		}
+		logger::info("[Placed] {} coin purses (flora that gives septims)", coinFlora.size());
 		materialRanks.clear();
 		for (auto* kw : RE::TESDataHandler::GetSingleton()->GetFormArray<RE::BGSKeyword>()) {
 			const char* edid = kw ? kw->GetFormEditorID() : nullptr;
