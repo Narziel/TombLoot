@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 1.4.0
+
+- Gear placed by other mods: a weapon or armor piece placed by hand by a mod's dungeon (or one defined by a mod and placed anywhere) in Nordic barrows, dragon priest lairs, Solstheim's barrows and Dwemer ruins becomes a base game era piece of the same kind (weapon type or armor slot), never of a higher material: iron and steel become Ancient Nord, and in Dwemer ruins only Dwarven gear or better becomes Dwarven. Always a Skyrim, Update or DLC piece, since a mod's ground model can sit badly on a rack. Enchanted pieces, artifacts, pieces already of the era (`"ancient_plugins"`, `"ancient_items"`, era keywords and the era lists' own pieces) and pieces of unknown material stay, and so do pieces with no base game era equivalent of their kind (maces and daggers in barrows).
+- Leveled placed objects: a reference with a dummy base and a leveled list (XLIB, as in Hammet's dungeons) is drawn by TombLoot when it loads in a tomb, from the same list, at the player's level, the same every time, then judged like any placed piece. Bethesda's own references of this kind are covered too.
+- Ancient Nord armor counts as iron for this: Bethesda tagged it `ArmorMaterialDaedric`.
+- The log says why each piece placed by a mod stays, and lists the base game era pieces available to each family at launch.
+
 ## 1.3.0
 
 - Gear laid out by hand: the iron helmet on a barrow altar, the gauntlets on the floor of a Dwemer ruin. Weapons and armor placed by Bethesda (Skyrim, Update, Dawnguard, HearthFires, Dragonborn) in Nordic barrows, dragon priest lairs, Solstheim's barrows and Dwemer ruins become an era piece of the same kind as they load, through the family's replacements: a helmet for a helmet, a sword for a sword, enchanted only if the original was, within the player's level. The piece depends on the object, so it is the same every time; nothing goes in the save, and removing TombLoot brings the original back. Persistent (quest) objects, owned objects and pieces enchanted on their own are left alone, and so are pieces with no era equivalent of their kind. `"placed"` in each family of the config; remove it to turn it off.

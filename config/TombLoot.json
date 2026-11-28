@@ -277,7 +277,9 @@
 		"era_keywords": [ "WeapMaterialDraugr", "WeapMaterialDraugrHoned" ],
 		// Weapons and armor placed by hand in the base game (altars, tables, floors) in these places get a
 		// piece of the same kind from the era lists below when they load: the same each time, nothing in the
-		// save. Quest, owned and enchanted-by-hand pieces stay. Remove "placed" to turn it off.
+		// save. Quest, owned and enchanted-by-hand pieces stay. A piece placed by a mod, or defined by one,
+		// gets a base game era piece of the same kind, never of a higher material (iron or steel -> Ancient
+		// Nord); enchanted pieces, artifacts and pieces of unknown material stay. Remove "placed" to turn it off.
 		"placed": { "loc_types": [ "LocTypeDraugrCrypt", "LocTypeDragonPriestLair" ] },
 
 		// Generic list -> era list. Only the entry's object changes: level and count stay.

@@ -400,10 +400,87 @@ namespace Swap
 			std::vector<std::string>                                        locTypes;
 			std::vector<std::string>                                        rootPlugins;
 			std::unordered_map<RE::TESForm*, std::vector<RE::TESLevItem*>> targets;
+			// For pieces placed by mods, or defined by mods: every piece the era lists can give (already of
+			// the era), the era keywords, and the base game pieces among them, with their level and rank.
+			struct Vanilla
+			{
+				RE::TESBoundObject* piece;
+				std::uint16_t       level;
+				int                 kind;
+				int                 rank;
+			};
+			std::unordered_set<RE::TESForm*> eraPieces;
+			std::vector<RE::BGSKeyword*>     eraKeywords;
+			std::vector<Vanilla>             vanilla;
 		};
 		std::vector<PlacedFamily> placedFamilies;  // families with a root plugin come first (Solstheim before Skyrim)
 		std::shared_mutex         placedLock;      // the hook reads on the loading threads; Apply writes
 		std::atomic<std::uint32_t> placedSwapped{ 0 };
+
+		// Rank of a material keyword: a piece placed by a mod never becomes an era piece of a higher rank.
+		std::unordered_map<RE::BGSKeyword*, int> materialRanks;
+		std::unordered_set<std::string>          ancientPluginNames;  // lowercase: every piece of these is of the era
+		std::unordered_set<RE::TESForm*>         ancientItemForms;
+		std::mutex                               unknownLock;  // bases with no known material, noted once
+		std::unordered_set<RE::TESForm*>         unknownNoted;
+
+		constexpr std::pair<std::string_view, int> kMaterialRanks[] = {
+			// Weapons
+			{ "WeapMaterialWood", 0 },
+			{ "WeapMaterialIron", 1 },
+			{ "WeapMaterialDraugr", 1 },
+			{ "WeapMaterialSteel", 2 },
+			{ "WeapMaterialImperial", 2 },
+			{ "WeapMaterialSilver", 2 },
+			{ "WeapMaterialDraugrHoned", 2 },
+			{ "WeapMaterialElven", 3 },
+			{ "WeapMaterialDwarven", 3 },
+			{ "WeapMaterialOrcish", 3 },
+			{ "WeapMaterialFalmer", 3 },
+			{ "WeapMaterialFalmerHoned", 3 },
+			{ "DLC2WeaponMaterialNordic", 3 },
+			{ "WeapMaterialGlass", 4 },
+			{ "WeapMaterialEbony", 5 },
+			{ "DLC2WeaponMaterialStalhrim", 5 },
+			{ "WeapMaterialDaedric", 6 },
+			{ "DLC1WeapMaterialDragonbone", 6 },
+			// Armor
+			{ "ArmorMaterialHide", 0 },
+			{ "ArmorMaterialLeather", 0 },
+			{ "ArmorMaterialStudded", 0 },
+			{ "ArmorMaterialImperialLight", 0 },
+			{ "ArmorMaterialImperialStudded", 0 },
+			{ "ArmorMaterialStormcloak", 0 },
+			{ "ArmorMaterialForsworn", 0 },
+			{ "DLC1ArmorMaterialVampire", 0 },
+			{ "ArmorMaterialIron", 1 },
+			{ "ArmorMaterialIronBanded", 1 },
+			{ "ArmorMaterialSteel", 2 },
+			{ "ArmorMaterialImperialHeavy", 2 },
+			{ "ArmorMaterialScaled", 2 },
+			{ "ArmorMaterialElven", 2 },
+			{ "DLC1ArmorMaterialDawnguard", 2 },
+			{ "DLC2ArmorMaterialBonemoldLight", 2 },
+			{ "DLC2ArmorMaterialBonemoldHeavy", 2 },
+			{ "DLC2ArmorMaterialChitinLight", 2 },
+			{ "DLC2ArmorMaterialChitinHeavy", 3 },
+			{ "ArmorMaterialDwarven", 3 },
+			{ "ArmorMaterialOrcish", 3 },
+			{ "ArmorMaterialElvenGilded", 3 },
+			{ "ArmorMaterialFalmer", 3 },
+			{ "ArmorMaterialSteelPlate", 4 },
+			{ "ArmorMaterialGlass", 4 },
+			{ "DLC1ArmorMaterialFalmerHardened", 4 },
+			{ "DLC1ArmorMaterialFalmerHeavy", 4 },
+			{ "DLC2ArmorMaterialNordicLight", 4 },
+			{ "DLC2ArmorMaterialNordicHeavy", 4 },
+			{ "ArmorMaterialEbony", 5 },
+			{ "DLC2ArmorMaterialStalhrimLight", 5 },
+			{ "DLC2ArmorMaterialStalhrimHeavy", 5 },
+			{ "ArmorMaterialDaedric", 6 },
+			{ "ArmorMaterialDragonplate", 6 },
+			{ "ArmorMaterialDragonscale", 6 },
+		};
 
 		bool SameText(std::string_view a, std::string_view b)
 		{
@@ -492,21 +569,227 @@ namespace Swap
 			return file && std::ranges::any_of(a_family.rootPlugins, [&](const auto& a_plugin) { return SameText(file->GetFilename(), a_plugin); });
 		}
 
-		// Before the piece loads: a generic piece placed by Bethesda in a tomb becomes an era piece of the same
-		// kind, chosen by its reference (the same each time, nothing in the save; without TombLoot it comes back).
+		// Lowest rank among the material keywords of a piece; -1 when none is known.
+		int RankOf(const RE::TESForm* a_form)
+		{
+			const auto* kwForm = a_form ? a_form->As<RE::BGSKeywordForm>() : nullptr;
+			int         rank = -1;
+			if (!kwForm || !kwForm->keywords) {
+				return rank;
+			}
+			for (std::uint32_t i = 0; i < kwForm->numKeywords; ++i) {
+				if (const auto it = materialRanks.find(kwForm->keywords[i]); it != materialRanks.end()) {
+					rank = rank < 0 ? it->second : (std::min)(rank, it->second);
+				}
+			}
+			return rank;
+		}
+
+		// One piece among those of the player's level (the lowest ones when none is reached yet), chosen by
+		// the reference: the same each time, nothing in the save.
+		template <class Pieces>
+		RE::TESBoundObject* PickFor(const RE::TESObjectREFR* a_ref, const Pieces& a_pieces)
+		{
+			const auto* player = RE::PlayerCharacter::GetSingleton();
+			const auto  level = static_cast<std::uint16_t>((std::max)(player ? static_cast<int>(player->GetLevel()) : 1, 1));
+			std::vector<RE::TESBoundObject*> choice;
+			for (const auto& [piece, min] : a_pieces) {
+				if (min <= level) {
+					choice.push_back(piece);
+				}
+			}
+			if (choice.empty()) {
+				const auto lowest = std::ranges::min_element(a_pieces, {}, [](const auto& a_p) { return a_p.second; })->second;
+				for (const auto& [piece, min] : a_pieces) {
+					if (min == lowest) {
+						choice.push_back(piece);
+					}
+				}
+			}
+			std::uint64_t seed = a_ref->GetFormID() * 0x9E3779B97F4A7C15ULL;
+			seed ^= seed >> 31;
+			return choice[static_cast<std::size_t>(seed % choice.size())];
+		}
+
+		std::string PlaceName(const RE::BGSLocation* a_location)
+		{
+			const char* place = a_location->GetName();
+			return place && *place ? place : Forms::Label(a_location);
+		}
+
+		bool OfTheEra(const PlacedFamily& a_family, RE::TESForm* a_base)
+		{
+			if (a_family.eraPieces.contains(a_base) || ancientItemForms.contains(a_base)) {
+				return true;
+			}
+			const auto* kwForm = a_base->As<RE::BGSKeywordForm>();
+			if (kwForm && std::ranges::any_of(a_family.eraKeywords, [&](auto* kw) { return kwForm->HasKeyword(kw); })) {
+				return true;
+			}
+			const auto* file = a_base->GetFile(0);
+			if (!file) {
+				return false;
+			}
+			std::string name{ file->GetFilename() };
+			std::ranges::transform(name, name.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+			return ancientPluginNames.contains(name);
+		}
+
+		// A piece placed by a mod, or defined by a mod, in a tomb: a base game era piece of the same kind and
+		// never of a higher rank (a mod's model can have its collision off and fall from its rack). Unique
+		// pieces (enchanted, artifacts) and pieces of unknown material stay (nullptr).
+		RE::TESBoundObject* ModPick(const RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, const RE::BGSLocation* a_location)
+		{
+			const int kind = KindOf(a_base);
+			if (kind == 0 || !a_base->GetPlayable() || Enchanted(a_base)) {
+				logger::info("[Placed] (mod): {} kind {}, playable {}, enchanted {}: stays | ref 0x{:08X}", Forms::Named(a_base), kind,
+					a_base->GetPlayable(), Enchanted(a_base), a_ref->GetFormID());
+				return nullptr;
+			}
+			const auto* kwForm = a_base->As<RE::BGSKeywordForm>();
+			if (kwForm && (kwForm->HasKeywordString("MagicDisallowEnchanting") || kwForm->HasKeywordString("DaedricArtifact"))) {
+				logger::info("[Placed] (mod): {} unique (artifact or no enchanting): stays | ref 0x{:08X}", Forms::Named(a_base), a_ref->GetFormID());
+				return nullptr;
+			}
+			for (const auto& family : placedFamilies) {
+				if (!PlaceMatches(family, a_location)) {
+					continue;
+				}
+				if (OfTheEra(family, a_base)) {
+					logger::info("[Placed] {} (mod): {} already of the era, stays | ref 0x{:08X}", family.name, Forms::Named(a_base), a_ref->GetFormID());
+					return nullptr;
+				}
+				const int rank = RankOf(a_base);
+				if (rank < 0) {
+					std::scoped_lock noted{ unknownLock };
+					if (unknownNoted.insert(a_base).second) {
+						logger::info("[Placed] {} (mod): {} has no known material, stays | ref 0x{:08X} | {}", family.name, Forms::Named(a_base),
+							a_ref->GetFormID(), PlaceName(a_location));
+					}
+					return nullptr;
+				}
+				std::vector<std::pair<RE::TESBoundObject*, std::uint16_t>> pieces;
+				for (const auto& v : family.vanilla) {
+					if (v.kind == kind && v.rank <= rank) {
+						pieces.emplace_back(v.piece, v.level);
+					}
+				}
+				if (pieces.empty()) {
+					logger::info("[Placed] {} (mod): {} kind {} rank {}: no base game era piece of this kind up to this rank, stays | ref 0x{:08X}",
+						family.name, Forms::Named(a_base), kind, rank, a_ref->GetFormID());
+					return nullptr;
+				}
+				auto* pick = PickFor(a_ref, pieces);
+				logger::info("[Placed] {} (mod): {} -> {} | ref 0x{:08X} from {} | {}", family.name, Forms::Named(a_base), Forms::Named(pick),
+					a_ref->GetFormID(), a_ref->GetFile(0)->GetFilename(), PlaceName(a_location));
+				return pick;
+			}
+			return nullptr;
+		}
+
+		// A generic piece placed by Bethesda in a tomb: an era piece of the same kind from the family's
+		// replacements (nullptr: it stays).
+		RE::TESBoundObject* BethesdaPick(const RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, const RE::BGSLocation* a_location)
+		{
+			const int kind = KindOf(a_base);
+			if (kind == 0) {
+				return nullptr;
+			}
+			for (const auto& family : placedFamilies) {
+				const auto it = family.targets.find(a_base);
+				if (it == family.targets.end() || !PlaceMatches(family, a_location)) {
+					continue;
+				}
+				std::map<RE::TESBoundObject*, std::uint16_t> pieces;
+				std::unordered_set<RE::TESLevItem*>          visited;
+				for (auto* list : it->second) {
+					CollectPieces(list, 1, visited, pieces);
+				}
+				const bool enchanted = Enchanted(a_base);
+				std::erase_if(pieces, [&](const auto& a_p) { return KindOf(a_p.first) != kind || Enchanted(a_p.first) != enchanted; });
+				if (pieces.empty()) {
+					return nullptr;  // no era piece of this kind (a mace…): it stays
+				}
+				auto* pick = PickFor(a_ref, pieces);
+				logger::info("[Placed] {}: {} -> {} | ref 0x{:08X} | {}", family.name, Forms::Named(a_base), Forms::Named(pick), a_ref->GetFormID(),
+					PlaceName(a_location));
+				return pick;
+			}
+			return nullptr;
+		}
+
+		// The era piece for a piece placed in a tomb, by who placed it (nullptr: it stays).
+		RE::TESBoundObject* EraPick(const RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, const RE::BGSLocation* a_location)
+		{
+			return OfficialFile(a_ref->GetFile(0)) && OfficialFile(a_base->GetFile(0)) ? BethesdaPick(a_ref, a_base, a_location) :
+			                                                                             ModPick(a_ref, a_base, a_location);
+		}
+
+		// XLIB of a reference: a dummy base (DummyWeapon1H, DummyHelmet) and a leveled list the engine draws the
+		// real piece from, after InitItemImpl (Hammet's dungeons). Not in this CommonLib version.
+		struct ExtraLeveledItemBase : RE::BSExtraData
+		{
+			RE::TESLevItem* levItem;
+		};
+		static_assert(sizeof(ExtraLeveledItemBase) == 0x18);
+
+		std::uint64_t NextSeed(std::uint64_t& a_state)
+		{
+			a_state += 0x9E3779B97F4A7C15ULL;
+			std::uint64_t z = a_state;
+			z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
+			z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
+			return z ^ (z >> 31);
+		}
+
+		// The draw of a leveled list as the engine makes it (entries up to the player's level, only the highest
+		// level unless the list takes every level, chance none), seeded by the reference. nullptr: nothing, or not
+		// a weapon or armor piece.
+		RE::TESBoundObject* Draw(RE::TESForm* a_form, std::uint16_t a_level, std::uint64_t& a_seed, int a_depth = 0)
+		{
+			auto* list = a_form ? a_form->As<RE::TESLevItem>() : nullptr;
+			if (!list) {
+				return a_form && (a_form->Is(RE::FormType::Weapon) || a_form->Is(RE::FormType::Armor)) ? static_cast<RE::TESBoundObject*>(a_form) : nullptr;
+			}
+			if (a_depth > 16) {
+				return nullptr;
+			}
+			if (list->chanceNone > 0 && static_cast<int>(NextSeed(a_seed) % 100) < list->chanceNone) {
+				return nullptr;
+			}
+			std::vector<const RE::LEVELED_OBJECT*> eligible;
+			std::uint16_t                          top = 0;
+			for (const auto& entry : list->entries) {
+				if (entry.form && entry.level <= a_level) {
+					eligible.push_back(&entry);
+					top = (std::max)(top, entry.level);
+				}
+			}
+			if (!(list->llFlags & RE::TESLeveledList::kCalculateFromAllLevelsLTOrEqPCLevel)) {
+				std::erase_if(eligible, [&](const auto* a_e) { return a_e->level != top; });
+			}
+			if (eligible.empty()) {
+				return nullptr;
+			}
+			const auto* entry = eligible[static_cast<std::size_t>(NextSeed(a_seed) % eligible.size())];
+			return Draw(entry->form, a_level, a_seed, a_depth + 1);
+		}
+
+		// After InitItemImpl, before the piece's 3D loads: a generic piece placed by Bethesda in a tomb becomes an
+		// era piece of the same kind, chosen by its reference (the same each time, nothing in the save; without
+		// TombLoot it comes back). A piece placed by a mod, or defined by one, goes through ModPick. A leveled base
+		// (XLIB) is drawn here, then judged like a piece placed as is; the XLIB is dropped so the engine keeps it.
 		void SwapPlaced(RE::TESObjectREFR* a_ref)
 		{
 			auto* base = a_ref ? a_ref->GetBaseObject() : nullptr;
-			if (!base || !(base->Is(RE::FormType::Weapon) || base->Is(RE::FormType::Armor)) || a_ref->IsPersistent() || !OfficialFile(a_ref->GetFile(0))) {
+			if (!base || !(base->Is(RE::FormType::Weapon) || base->Is(RE::FormType::Armor)) || a_ref->IsPersistent() || a_ref->IsDynamicForm()) {
 				return;
 			}
-			std::shared_lock lock{ placedLock };
-			const auto       found = std::ranges::find_if(placedFamilies, [&](const auto& a_f) { return a_f.targets.contains(base); });
-			if (found == placedFamilies.end()) {
+			if (!a_ref->GetFile(0)) {
 				return;
 			}
-			const int kind = KindOf(base);
-			if (kind == 0 || a_ref->GetOwner() || a_ref->extraList.HasType(RE::ExtraDataType::kEnchantment)) {
+			if (a_ref->GetOwner() || a_ref->extraList.HasType(RE::ExtraDataType::kEnchantment) ||
+				a_ref->extraList.HasType(RE::ExtraDataType::kAliasInstanceArray)) {
 				return;
 			}
 			const auto* cell = a_ref->GetParentCell();
@@ -517,56 +800,43 @@ namespace Swap
 			if (!location) {
 				return;
 			}
-			for (const auto& family : placedFamilies) {
-				const auto it = family.targets.find(base);
-				if (it == family.targets.end() || !PlaceMatches(family, location)) {
-					continue;
+			std::shared_lock lock{ placedLock };
+			if (std::ranges::none_of(placedFamilies, [&](const auto& a_f) { return PlaceMatches(a_f, location); })) {
+				return;
+			}
+			auto* xlib = static_cast<ExtraLeveledItemBase*>(a_ref->extraList.GetByType(RE::ExtraDataType::kLeveledItemBase));
+			if (xlib && xlib->levItem) {
+				const auto*   player = RE::PlayerCharacter::GetSingleton();
+				const auto    level = static_cast<std::uint16_t>((std::max)(player ? static_cast<int>(player->GetLevel()) : 1, 1));
+				std::uint64_t seed = a_ref->GetFormID() ^ 0x5A17E5EEDULL;
+				auto*         drawn = Draw(xlib->levItem, level, seed);
+				if (!drawn) {
+					return;  // nothing drawn (chance none): left to the engine
 				}
-				std::map<RE::TESBoundObject*, std::uint16_t> pieces;
-				std::unordered_set<RE::TESLevItem*>          visited;
-				for (auto* list : it->second) {
-					CollectPieces(list, 1, visited, pieces);
+				auto* pick = EraPick(a_ref, drawn, location);
+				logger::info("[Placed] leveled base {} drawn: {}{} | ref 0x{:08X} | {}", Forms::Label(xlib->levItem), Forms::Named(drawn),
+					pick ? " (replaced)" : " (kept)", a_ref->GetFormID(), PlaceName(location));
+				a_ref->extraList.RemoveByType(RE::ExtraDataType::kLeveledItemBase);
+				a_ref->SetObjectReference(pick ? pick : drawn);
+				if (pick) {
+					placedSwapped.fetch_add(1);
 				}
-				const bool enchanted = Enchanted(base);
-				std::erase_if(pieces, [&](const auto& a_p) { return KindOf(a_p.first) != kind || Enchanted(a_p.first) != enchanted; });
-				if (pieces.empty()) {
-					return;  // no era piece of this kind (a mace…): it stays
-				}
-				// Among the pieces of the player's level; the lowest ones when none is reached yet.
-				const auto* player = RE::PlayerCharacter::GetSingleton();
-				const auto  level = static_cast<std::uint16_t>((std::max)(player ? static_cast<int>(player->GetLevel()) : 1, 1));
-				std::vector<RE::TESBoundObject*> choice;
-				for (const auto& [piece, min] : pieces) {
-					if (min <= level) {
-						choice.push_back(piece);
-					}
-				}
-				if (choice.empty()) {
-					const auto lowest = std::ranges::min_element(pieces, {}, [](const auto& a_p) { return a_p.second; })->second;
-					for (const auto& [piece, min] : pieces) {
-						if (min == lowest) {
-							choice.push_back(piece);
-						}
-					}
-				}
-				std::uint64_t seed = a_ref->GetFormID() * 0x9E3779B97F4A7C15ULL;
-				seed ^= seed >> 31;
-				auto* pick = choice[static_cast<std::size_t>(seed % choice.size())];
+				return;
+			}
+			if (auto* pick = EraPick(a_ref, base, location)) {
 				a_ref->SetObjectReference(pick);
 				placedSwapped.fetch_add(1);
-				const char* place = location->GetName();
-				logger::info("[Placed] {}: {} -> {} | ref 0x{:08X} | {}", family.name, Forms::Named(base), Forms::Named(pick), a_ref->GetFormID(),
-					place && *place ? place : Forms::Label(location));
-				return;
 			}
 		}
 
 		struct PlacedHook
 		{
+			// After the original: a reference with a leveled base (XLIB, on a dummy base) gets its piece drawn
+			// there. Still before the 3D loads.
 			static void thunk(RE::TESObjectREFR* a_ref)
 			{
-				SwapPlaced(a_ref);
 				func(a_ref);
+				SwapPlaced(a_ref);
 			}
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
@@ -600,6 +870,32 @@ namespace Swap
 						}
 					}
 				}
+			}
+			// What the era lists give, for pieces placed by mods: base game pieces only, not enchanted. A piece
+			// with no material keyword (Ancient Nord armor) counts as iron.
+			family.eraKeywords = a_eraKeywords;
+			std::map<RE::TESBoundObject*, std::uint16_t> pieces;
+			std::unordered_set<RE::TESLevItem*>          visited;
+			for (const auto& [toList, sources] : a_bySource) {
+				for (auto* source : sources) {
+					CollectPieces(a_table.at(source), 1, visited, pieces);
+				}
+			}
+			for (const auto& [piece, level] : pieces) {
+				family.eraPieces.insert(piece);
+				const int kind = KindOf(piece);
+				if (kind != 0 && OfficialFile(piece->GetFile(0)) && !Enchanted(piece) && piece->GetPlayable()) {
+					// Bethesda tagged the Ancient Nord armor ArmorMaterialDaedric: it counts as iron.
+					static const std::array kAncientNordArmor{ "Skyrim.esm|0x018388"sv, "Skyrim.esm|0x056A9E"sv, "Skyrim.esm|0x056B17"sv,
+						"Skyrim.esm|0x056A9D"sv };
+					const bool ancientNord = std::ranges::any_of(kAncientNordArmor, [&](auto a_ref) { return Forms::Resolve(a_ref) == piece; });
+					const int  rank = ancientNord ? 1 : RankOf(piece);
+					family.vanilla.push_back({ piece, level, kind, rank < 0 ? 1 : rank });
+				}
+			}
+			logger::info("[Placed] {}: {} base game era pieces for pieces placed by mods", a_name, family.vanilla.size());
+			for (const auto& v : family.vanilla) {
+				logger::info("[Placed]   {} kind {} rank {} level {}", Forms::Named(v.piece), v.kind, v.rank, v.level);
 			}
 			logger::info("[Placed] {}: {} generic pieces placed by hand in {} get an era piece{}", a_name, family.targets.size(),
 				[&] {
@@ -750,7 +1046,7 @@ namespace Swap
 	void InstallPlaced()
 	{
 		REL::Relocation<std::uintptr_t> vtable{ RE::VTABLE_TESObjectREFR[0] };
-		PlacedHook::func = vtable.write_vfunc(0x13, PlacedHook::thunk);  // InitItemImpl: before the piece loads
+		PlacedHook::func = vtable.write_vfunc(0x13, PlacedHook::thunk);  // InitItemImpl: after the leveled base is drawn, before the 3D
 		logger::info("[Placed] hook installed (InitItemImpl of TESObjectREFR)");
 	}
 
@@ -763,6 +1059,28 @@ namespace Swap
 	{
 		std::unique_lock lock{ placedLock };  // the placed pieces' hook waits while lists change
 		placedFamilies.clear();
+		materialRanks.clear();
+		for (auto* kw : RE::TESDataHandler::GetSingleton()->GetFormArray<RE::BGSKeyword>()) {
+			const char* edid = kw ? kw->GetFormEditorID() : nullptr;
+			if (!edid) {
+				continue;
+			}
+			if (const auto it = std::ranges::find_if(kMaterialRanks, [&](const auto& a_m) { return SameText(a_m.first, edid); });
+				it != std::end(kMaterialRanks)) {
+				materialRanks[kw] = it->second;
+			}
+		}
+		ancientPluginNames.clear();
+		for (auto name : a_config.ancientPlugins) {
+			std::ranges::transform(name, name.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+			ancientPluginNames.insert(std::move(name));
+		}
+		ancientItemForms.clear();
+		for (const auto& ref : a_config.ancientItems) {
+			if (auto* form = Forms::Resolve(ref)) {
+				ancientItemForms.insert(form);
+			}
+		}
 		Restore();
 		BuildCreated(a_config);
 		BuildUsers();

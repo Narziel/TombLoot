@@ -61,6 +61,10 @@ In Skyrim, a barrow sealed for three thousand years draws its treasure from the 
 
 The iron helmet resting on a barrow altar, the steel gauntlets on the floor of a Dwemer hall: Bethesda laid them out by hand, and no loot list ever touched them. Now they are of their age too. A helmet stays a helmet, a sword stays a sword, enchanted only if it was, always the same piece for the same spot. Quest items and owned objects are left alone, and nothing goes in your save.
 
+[size=4][color=#e6b65c][b]New in 1.4: what other mods lay out[/b][/color][/size]
+
+Dungeon mods lay out their own gear too: a steel helmet by a sarcophagus, an iron axe beside a skeleton. In a barrow or a Dwemer ruin, it now becomes a piece of the era from the base game, never better than what lay there: iron and steel become Ancient Nord. Enchanted pieces and artifacts stay, and so does anything with no ancient equivalent (a mace, a dagger).
+
 Only the [i]object[/i] of each loot entry changes. Levels, quantities and chances stay exactly as your load order set them: [b]not more loot, not less, only loot of the right age.[/b]
 
 [line]
@@ -86,7 +90,7 @@ TombLoot does not live in a plugin. It works [b]at launch, in memory, after ever
 
 [list]
 [*]Bandit camps, forts, merchants, NPC outfits: the living keep their gear.
-[*]Uniques, quest items, owned objects, the rewards that Bethesda and Open World Loot put in specific chests, and anything placed by another mod.
+[*]Uniques, artifacts, quest items, owned objects, and the rewards that Bethesda and Open World Loot put in specific chests.
 [*]Gems, ingots, potions, scrolls, jewelry, and the gold of perks (Golden Touch, Imperial Luck).
 [*]Falmer hives: the Falmer prey on today's travellers, so iron in their nests makes sense.
 [/list]
@@ -146,7 +150,7 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 
 [size=4][color=#e6b65c][b]License and source[/b][/color][/size]
 
-TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.3.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
+TombLoot is free software under the GNU General Public License v3 or later. The source code is on [url=https://github.com/Narziel/TombLoot]GitHub[/url] (one tag per version, the latest is v1.4.0). It links CommonLibSSE-NG and several MIT/BSD libraries; their notices are in [font=Courier New]THIRD_PARTY_LICENSES.txt[/font].
 
 [center][i][color=#9fb8bd]May the dead keep their own.[/color][/i][/center]
 
@@ -232,6 +236,10 @@ TombLoot is released under the GNU General Public License v3 or later. You may u
 ---------------------------------------------------------------------
 ONGLET « Logs » (changelog, une ligne par point)
 ---------------------------------------------------------------------
+
+1.4.0
+- Gear laid out by other mods in barrows and Dwemer ruins becomes a base game piece of the era, never of a better material (iron and steel become Ancient Nord); enchanted pieces, artifacts and pieces with no ancient equivalent stay.
+- Leveled placed objects (Hammet's dungeons) are drawn when they load and treated the same way.
 
 1.3.0
 - Gear laid out by hand in barrows and Dwemer ruins (helmets on altars, weapons on tables) becomes gear of the era too, the same piece every time; quest and owned objects are left alone.

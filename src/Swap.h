@@ -30,7 +30,9 @@ namespace Swap
 
 	void Apply(const Config& a_config);
 
-	// Weapons and armor placed by hand in the base game get an era piece when they load (config "placed").
+	// Weapons and armor placed by hand get an era piece when they load (config "placed"): by the base game,
+	// through the family's replacements; by a mod, or defined by one, a base game era piece of the same kind
+	// and never of a higher material.
 	void          InstallPlaced();
 	std::uint32_t PlacedSwapped();
 
