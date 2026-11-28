@@ -36,7 +36,7 @@ DESCRIPTION (champ principal, BBCode)
 [center][size=6][color=#e6b65c][b]TombLoot[/b][/color][/size]
 [size=4][i][color=#bfe3ea]Ancient tombs. Ancient loot.[/color][/i][/size][/center]
 
-[line]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/divider.png[/img][/center]
 
 [center][i][color=#9fb8bd]The torch gutters. Behind you, the last draugr crumbles into dust and frost.
 Before you, a stone coffer that no living hand has opened since the Dragon War.
@@ -44,7 +44,9 @@ You lift the lid, and the cold light of the First Era spills out…[/color][/i]
 
 [size=4][b]…and inside lies an iron sword. Forged last spring, in Whiterun.[/b][/size][/center]
 
-[line]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/features.png[/img][/center]
+
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/divider.png[/img][/center]
 
 [size=5][color=#e6b65c][b]Not any more.[/b][/color][/size]
 
@@ -74,9 +76,7 @@ The septims scattered on a barrow altar and the coin purse beside a skeleton are
 
 Only the [i]object[/i] of each loot entry changes. Levels, quantities and chances stay exactly as your load order set them: [color=#e6a84a][b]not more loot, not less, only loot of the right age.[/b][/color]
 
-[line]
-
-[size=5][color=#e6b65c][b]Why your loot overhaul was not enough[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-why-your-loot-overhaul-was-not-enough.png[/img][/center]
 
 You installed a loot overhaul. It cleaned the tomb lists. Then your Bashed Patch, your Synthesis patch or a new armor mod merged the lists again, and quietly brought the iron back. You never knew why.
 
@@ -91,9 +91,7 @@ TombLoot does not live in a plugin. It works [color=#e6a84a][b]at launch, in mem
 [*][color=#e6a84a][b]It costs nothing[/b][/color] — about 10 milliseconds at launch, and a quick check when an object loads in a tomb. No script, no event, nothing in your save.
 [/list]
 
-[line]
-
-[size=5][color=#e6b65c][b]What it never touches[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-what-it-never-touches.png[/img][/center]
 
 [list]
 [*]Bandit camps, forts, merchants, NPC outfits: the living keep their gear.
@@ -102,9 +100,7 @@ TombLoot does not live in a plugin. It works [color=#e6a84a][b]at launch, in mem
 [*]Falmer hives: the Falmer prey on today's travellers, so iron in their nests makes sense.
 [/list]
 
-[line]
-
-[size=5][color=#e6b65c][b]Plays well with[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-plays-well-with.png[/img][/center]
 
 [list]
 [*][color=#e6a84a][b]Open World Loot[/b][/color] — tested. TombLoot puts back the Dwarven-only and Ancient Nord loot that a Bashed Patch removes, and keeps random ebony out.
@@ -119,9 +115,7 @@ TombLoot does not live in a plugin. It works [color=#e6a84a][b]at launch, in mem
 [*][color=#e6a84a][b]Dungeon and barrow mods[/b][/color] — covered when they reuse the vanilla tomb lists; otherwise their lists can be added to the config in one line.
 [/list]
 
-[line]
-
-[size=5][color=#e6b65c][b]Installing or removing mid-game[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-installing-or-removing-mid-game.png[/img][/center]
 
 Skyrim fills a chest the first time its area loads, then keeps it until the area resets.
 
@@ -130,17 +124,13 @@ Skyrim fills a chest the first time its area loads, then keeps it until the area
 [*][color=#e6a84a][b]Removed:[/b][/color] nothing is stored in your save. Chests already filled keep their items; tombs give vanilla loot again when they reset.
 [/list]
 
-[line]
-
-[size=5][color=#e6b65c][b]For the curious[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-for-the-curious.png[/img][/center]
 
 [b]Config:[/b] [font=Courier New]Data/SKSE/Plugins/TombLoot/TombLoot.json[/font], fully commented. Add the lists and chests of your own mods, add ancient pieces from an armor mod, or switch the report to "full" or "off". It is read again at every game load.
 
 [b]Log:[/b] [font=Courier New]Documents/My Games/Skyrim Special Edition/SKSE/TombLoot.log[/font]. Found an iron sword in a barrow? The [b][Summary][/b] lines name the chest and the list that brought it. Post them in a comment and it will be fixed.
 
-[line]
-
-[size=5][color=#e6b65c][b]The family[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-the-family.png[/img][/center]
 
 TombLoot is part of a small family of mods for a world that makes sense. Each one stands alone; together, Skyrim makes sense.
 
@@ -152,9 +142,7 @@ TombLoot is part of a small family of mods for a world that makes sense. Each on
 
 [center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/series.png[/img][/center]
 
-[line]
-
-[size=4][color=#e6b65c][b]Requirements[/b][/color][/size]
+[center][img]https://raw.githubusercontent.com/Narziel/BannerLoot/main/art/page/tombloot/h-requirements.png[/img][/center]
 
 [list]
 [*][url=https://www.nexusmods.com/skyrimspecialedition/mods/30379]SKSE64[/url]
